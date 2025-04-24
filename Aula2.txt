@@ -1,0 +1,17 @@
+Peer-to-Peer (P2P)
+	-> Sistemas distribuídos onde não há hierarquia entre os membros da rede.
+	-> Os pares compartilham recursos sem um intermediário.
+	-> Ex. uTorrent
+	-> Auto-organização: sem coordenador
+	-> Cada nó pode fornecer ou obter recursos.
+	-> Super nós
+
+Agente de Interface: Word
+Agentes reativos: Ex. formiga e feromônio (estímulo)
+Agente híbrido: reúne mais de uma filosofia de agentes.
+
+------- Eventos e Notificações ---------
+-> Evento: ex. de um produto esgotado onde o cliente é avisado quando ele está disponível.
+	Chegada do produto (evento), avisar o cliente (notificação)
+
+->

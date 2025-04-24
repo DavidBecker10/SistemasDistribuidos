@@ -1,0 +1,5 @@
+Sistemas distribuídos: coleção de sistemas de computadores nos quais os processos e recursos estão espalhados por diferentes computadores.
+	- Compartilhamento de recursos;
+	- Exemplo: Internet;
+	- Heterogeneidade: Middleware - gerente de recursos (equivalente ao SO em um PC)
+		- O Middleware está entre as camadas de transporte e aplicação do modelo OSI
