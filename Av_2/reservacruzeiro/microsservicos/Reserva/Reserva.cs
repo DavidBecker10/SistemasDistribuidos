@@ -23,10 +23,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configurar o aplicativo
 var app = builder.Build();
 
-// Usar CORS
 app.UseCors("AllowAll");
 
 // Estado compartilhado para armazenar mensagens de status de pagamento
@@ -40,7 +38,7 @@ using var channel = await connection.CreateChannelAsync();
 // Declaração da exchange "direct_pagamento"
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
 
-// Carregar a chave pública do Pagamento
+// Carregar a chave publica do Pagamento
 if (!File.Exists(publicKeyPath))
 {
     Console.WriteLine($"Chave pública não encontrada no caminho: {publicKeyPath}");
@@ -50,7 +48,7 @@ var publicKeyBytes = File.ReadAllBytes(publicKeyPath);
 using var rsa = RSA.Create();
 rsa.ImportRSAPublicKey(publicKeyBytes, out _);
 
-// Método para verificar a assinatura
+// Metodo para verificar a assinatura
 bool VerifySignature(string message, string signature)
 {
     try
@@ -131,11 +129,10 @@ var queueRecusado = "reserva-pagamento-recusado";
 await channel.QueueDeclareAsync(queue: queueAprovado, durable: true, exclusive: false, autoDelete: false);
 await channel.QueueDeclareAsync(queue: queueRecusado, durable: true, exclusive: false, autoDelete: false);
 
-// Vincular as filas à exchange "direct_pagamento" com as routing keys apropriadas
+// Associar filas a exchange "direct_pagamento" com as routing keys apropriadas
 await channel.QueueBindAsync(queue: queueAprovado, exchange: "direct_pagamento", routingKey: "pagamento.aprovado");
 await channel.QueueBindAsync(queue: queueRecusado, exchange: "direct_pagamento", routingKey: "pagamento.recusado");
 
-// Iniciar consumo
 await channel.BasicConsumeAsync(queue: queueAprovado, autoAck: true, consumer: consumerPagamentoAprovado);
 await channel.BasicConsumeAsync(queue: queueRecusado, autoAck: true, consumer: consumerPagamentoRecusado);
 
@@ -144,7 +141,6 @@ app.MapGet("/api/pagamento/status", async (HttpContext context) =>
 {
     context.Response.ContentType = "application/json";
 
-    // Retornar todas as mensagens armazenadas
     var mensagens = pagamentoStatus.ToArray();
     pagamentoStatus.Clear();
     await context.Response.WriteAsync(JsonSerializer.Serialize(mensagens));
@@ -178,7 +174,6 @@ app.MapPost("/api/reserva/criar", async (HttpContext context) =>
 {
     try
     {
-        // Ler o corpo da requisição
         var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
         Console.WriteLine($"[Reserva Criada] Dados recebidos: {body}");
 
@@ -186,7 +181,6 @@ app.MapPost("/api/reserva/criar", async (HttpContext context) =>
         var bodyBytes = Encoding.UTF8.GetBytes(body);
         await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "reserva-criada", body: bodyBytes);
 
-        // Retornar sucesso
         context.Response.StatusCode = 201;
         await context.Response.WriteAsync("Reserva criada e publicada com sucesso!");
     }

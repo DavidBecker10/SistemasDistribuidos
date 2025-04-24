@@ -18,6 +18,7 @@ var body = Encoding.UTF8.GetBytes(message);
 int i = 0;
 while (i < 10)
 {
+    // Randomiza o local de promocao a cada segundos
     int randPromo = random.Next(1, 4);
 
     if (randPromo == 1)

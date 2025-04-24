@@ -10,6 +10,7 @@ function App() {
   const [selecoes, setSelecoes] = useState({});
   const [statusPagamentos, setStatusPagamentos] = useState([]);
 
+  // Busca de itinerarios pelos campos
   const handleSearch = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/itinerarios');
@@ -27,6 +28,7 @@ function App() {
     }
   };
 
+  // Metodo de selecao de campos
   const handleSelectChange = (id, campo, valor) => {
     setSelecoes((prevSelecoes) => ({
       ...prevSelecoes,
@@ -37,6 +39,7 @@ function App() {
     }));
   };
 
+  // Requisicao para criar reserva
   const handleSelect = async (itinerario) => {
     const selecao = selecoes[itinerario.id];
 
@@ -70,6 +73,7 @@ function App() {
     }
   };
 
+  // Requisicao para buscar o status do pagamento
   const fetchStatusPagamentos = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/pagamento/status');
@@ -80,7 +84,7 @@ function App() {
     }
   };
 
-  // Atualizar automaticamente os status de pagamento a cada 10 segundos
+  // Atualizar status pagamento a cada 10 segundos
   useEffect(() => {
     const interval = setInterval(fetchStatusPagamentos, 10000);
     return () => clearInterval(interval);

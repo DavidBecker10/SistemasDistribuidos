@@ -16,3 +16,4 @@ C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruz
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Bilhete\obj\Debug\net9.0\Bilhete.pdb
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Bilhete\obj\Debug\net9.0\Bilhete.genruntimeconfig.cache
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Bilhete\obj\Debug\net9.0\ref\Bilhete.dll
+C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Bilhete\obj\Debug\net9.0\Bilhete.sourcelink.json

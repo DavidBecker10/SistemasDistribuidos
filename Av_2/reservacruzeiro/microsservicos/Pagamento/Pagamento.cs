@@ -9,17 +9,16 @@ var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-// Declaração da exchange "direct_pagamento"
+// Exchange "direct_pagamento"
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
 
-// Declaração da fila "reserva-criada" (consumida por este serviço)
+// Fila "reserva-criada" (consumida por este serviço)
 await channel.QueueDeclareAsync(queue: "reserva-criada", durable: true, exclusive: false, autoDelete: false, arguments: null);
 
 // Diretórios para armazenar as chaves
 var privateKeyDir = "keys/private";
 var publicKeyDir = "keys/public";
 
-// Criar os diretórios, se não existirem
 Directory.CreateDirectory(privateKeyDir);
 Directory.CreateDirectory(publicKeyDir);
 
@@ -61,17 +60,16 @@ consumer.ReceivedAsync += async (model, ea) =>
         var message = Encoding.UTF8.GetString(body);
         Console.WriteLine($" [x] Received: {message}");
 
-        // Simular tempo de processamento (5 segundos)
+        // espera segundos
         await Task.Delay(5000);
 
-        // Gerar aleatoriamente se o pagamento foi aprovado ou recusado
+        // Gera aleatoriamente se o pagamento foi aprovado ou recusado
         var random = new Random();
         bool pagamentoAprovado = random.Next(0, 2) == 0; // 50% de chance
 
         // Routing key baseada no status do pagamento
         string routingKey = pagamentoAprovado ? "pagamento.aprovado" : "pagamento.recusado";
 
-        // Criar a mensagem de resposta
         var responseMessage = new { OriginalMessage = message, Status = pagamentoAprovado ? "Aprovado" : "Recusado" };
 
         // Serializar e assinar a mensagem

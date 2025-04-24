@@ -16,3 +16,4 @@ C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruz
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\Pagamento.pdb
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\Pagamento.genruntimeconfig.cache
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\ref\Pagamento.dll
+C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\Pagamento.sourcelink.json

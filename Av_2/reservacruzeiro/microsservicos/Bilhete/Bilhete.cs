@@ -4,25 +4,22 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-// Configurar conexão RabbitMQ
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-// Declaração da exchange
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
 
-// Declaração de fila específica para bilhete
+// fila para bilhete
 var queueName = "bilhete-pagamento-aprovado";
 await channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false);
 
-// Vincular a fila à exchange com a routing key "pagamento.aprovado"
+// assicia a fila e a exchange com a routing key "pagamento.aprovado"
 await channel.QueueBindAsync(queue: queueName, exchange: "direct_pagamento", routingKey: "pagamento.aprovado");
 
-// Caminho para a chave pública do microsserviço de Pagamento
+// chave publica do microsservico de Pagamento
 var publicKeyPath = "keys/public/public.key";
 
-// Carregar a chave pública
 if (!File.Exists(publicKeyPath))
 {
     Console.WriteLine($"Chave pública não encontrada no caminho: {publicKeyPath}");
@@ -32,7 +29,7 @@ var publicKeyBytes = File.ReadAllBytes(publicKeyPath);
 using var rsa = RSA.Create();
 rsa.ImportRSAPublicKey(publicKeyBytes, out _);
 
-// Método para verificar a assinatura
+// Metodo para verificar a assinatura
 bool VerifySignature(string message, string signature)
 {
     try
@@ -57,7 +54,6 @@ consumer.ReceivedAsync += async (model, ea) =>
         byte[] body = ea.Body.ToArray();
         var rawMessage = Encoding.UTF8.GetString(body);
 
-        // Deserializar a mensagem recebida
         var signedMessage = JsonSerializer.Deserialize<SignedMessage>(rawMessage);
 
         if (signedMessage != null && VerifySignature(signedMessage.Message, signedMessage.Signature))
@@ -84,7 +80,7 @@ consumer.ReceivedAsync += async (model, ea) =>
     await Task.CompletedTask;
 };
 
-// Iniciar consumo
+// consumo da fila "bilhete-pagamento-aprovado"
 await channel.BasicConsumeAsync(queue: queueName, autoAck: true, consumer: consumer);
 
 Console.WriteLine(" [*] Waiting for messages with routing key 'pagamento.aprovado'.");

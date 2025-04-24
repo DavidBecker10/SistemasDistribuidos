@@ -15,3 +15,4 @@ C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruz
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Reserva\obj\Debug\net9.0\Reserva.pdb
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Reserva\obj\Debug\net9.0\Reserva.genruntimeconfig.cache
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Reserva\obj\Debug\net9.0\ref\Reserva.dll
+C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Reserva\obj\Debug\net9.0\Reserva.sourcelink.json
