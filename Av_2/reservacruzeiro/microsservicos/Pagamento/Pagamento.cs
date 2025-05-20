@@ -9,13 +9,11 @@ var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-// Exchange "direct_pagamento"
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
 
-// Fila "reserva-criada" (consumida por este serviço)
+// fila reserva-criada
 await channel.QueueDeclareAsync(queue: "reserva-criada", durable: true, exclusive: false, autoDelete: false, arguments: null);
 
-// Diretórios para armazenar as chaves
 var privateKeyDir = "keys/private";
 var publicKeyDir = "keys/public";
 
@@ -40,7 +38,6 @@ else
     Console.WriteLine("Chaves não encontradas. Gerando novas...");
     rsa = RSA.Create(2048);
 
-    // Salvar as chaves em arquivos
     var privateKey = rsa.ExportRSAPrivateKey();
     var publicKey = rsa.ExportRSAPublicKey();
     File.WriteAllBytes(privateKeyPath, privateKey);
@@ -49,41 +46,37 @@ else
     Console.WriteLine($"Chaves geradas e salvas em:\n - {privateKeyPath}\n - {publicKeyPath}");
 }
 
-// Consumidor para a fila "reserva-criada"
+// Consumidor para a fila reserva-criada
 var consumer = new AsyncEventingBasicConsumer(channel);
 consumer.ReceivedAsync += async (model, ea) =>
 {
     try
     {
-        // Ler a mensagem da fila "reserva-criada"
         byte[] body = ea.Body.ToArray();
         var message = Encoding.UTF8.GetString(body);
         Console.WriteLine($" [x] Received: {message}");
 
-        // espera segundos
         await Task.Delay(5000);
 
-        // Gera aleatoriamente se o pagamento foi aprovado ou recusado
         var random = new Random();
-        bool pagamentoAprovado = random.Next(0, 2) == 0; // 50% de chance
+        bool pagamentoAprovado = random.Next(0, 2) == 0;
 
-        // Routing key baseada no status do pagamento
+        // routingKey baseada no status do pagamento
         string routingKey = pagamentoAprovado ? "pagamento.aprovado" : "pagamento.recusado";
 
         var responseMessage = new { OriginalMessage = message, Status = pagamentoAprovado ? "Aprovado" : "Recusado" };
-
-        // Serializar e assinar a mensagem
         var messageBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(responseMessage));
+
+        // assinar a mensagem
         var signature = rsa.SignData(messageBody, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 
-        // Empacotar a mensagem e a assinatura
         var signedMessage = new
         {
             Message = JsonSerializer.Serialize(responseMessage),
             Signature = Convert.ToBase64String(signature)
         };
 
-        // Publicar mensagem assinada na exchange
+        // publica mensagem assinada na exchange
         var responseBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(signedMessage));
         await channel.BasicPublishAsync(exchange: "direct_pagamento", routingKey: routingKey, body: responseBody);
 
@@ -95,7 +88,7 @@ consumer.ReceivedAsync += async (model, ea) =>
     }
 };
 
-// Iniciar consumo da fila "reserva-criada"
+// consumo da fila "reserva-criada"
 await channel.BasicConsumeAsync(queue: "reserva-criada", autoAck: true, consumer: consumer);
 
 Console.WriteLine(" [*] Waiting for messages in 'reserva-criada'.");

@@ -16,3 +16,4 @@ C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruz
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Assinante\obj\Debug\net9.0\Assinante.pdb
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Assinante\obj\Debug\net9.0\Assinante.genruntimeconfig.cache
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Assinante\obj\Debug\net9.0\ref\Assinante.dll
+C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_2\reservacruzeiro\microsservicos\Assinante\obj\Debug\net9.0\Assinante.sourcelink.json

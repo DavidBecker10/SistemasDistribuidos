@@ -12,7 +12,6 @@ var itinerariosJsonPath = "../../src/itinerarios.json";
 var publicKeyPath = "keys/public/public.key"; // Caminho da chave pública do Pagamento
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar suporte a CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -27,18 +26,16 @@ var app = builder.Build();
 
 app.UseCors("AllowAll");
 
-// Estado compartilhado para armazenar mensagens de status de pagamento
 var pagamentoStatus = new ConcurrentQueue<string>();
 
-// Configurar RabbitMQ
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-// Declaração da exchange "direct_pagamento"
+// exchange "direct_pagamento"
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
 
-// Carregar a chave publica do Pagamento
+// chave publica do Pagamento
 if (!File.Exists(publicKeyPath))
 {
     Console.WriteLine($"Chave pública não encontrada no caminho: {publicKeyPath}");
@@ -122,14 +119,12 @@ consumerPagamentoRecusado.ReceivedAsync += async (model, ea) =>
     await Task.CompletedTask;
 };
 
-// Declaração de filas para consumo
 var queueAprovado = "reserva-pagamento-aprovado";
 var queueRecusado = "reserva-pagamento-recusado";
 
 await channel.QueueDeclareAsync(queue: queueAprovado, durable: true, exclusive: false, autoDelete: false);
 await channel.QueueDeclareAsync(queue: queueRecusado, durable: true, exclusive: false, autoDelete: false);
 
-// Associar filas a exchange "direct_pagamento" com as routing keys apropriadas
 await channel.QueueBindAsync(queue: queueAprovado, exchange: "direct_pagamento", routingKey: "pagamento.aprovado");
 await channel.QueueBindAsync(queue: queueRecusado, exchange: "direct_pagamento", routingKey: "pagamento.recusado");
 
@@ -198,7 +193,6 @@ Console.WriteLine(" [*] Access '/api/reserva/criar' to create a reservation.");
 
 await app.RunAsync();
 
-// Classe para representar a estrutura da mensagem assinada
 public class SignedMessage
 {
     public string? Message { get; set; }
