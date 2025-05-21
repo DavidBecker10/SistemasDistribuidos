@@ -23,6 +23,8 @@ class Peer:
         self.peers = []
         self.jaVotou = False
         self.arquivosPeers = {}
+        self.eleicaoRodando = False
+        self.timeout = random.uniform(*NODE_TIMEOUT_RANGE)
 
         if not os.path.exists(self.pasta):
             print(f"Erro: o diretorio {self.pasta} nao existe.")
@@ -67,7 +69,7 @@ class Peer:
                             if isinstance(dados, dict) and "data" in dados and "encoding" in dados:
                                 if dados["encoding"] == "base64":
                                     dados_decodificados = base64.b64decode(dados["data"])
-                                    with open(os.path.join(self.pasta, f"recebido_{nomeArquivo}"), "wb") as f:
+                                    with open(os.path.join(self.pasta, nomeArquivo), "wb") as f:
                                         f.write(dados_decodificados)
                                     print(f"{self.nome} recebeu o arquivo '{nomeArquivo}' com sucesso de {peerEscolhido}")
                                     self.atualizarArquivos(nomeArquivo)
@@ -99,13 +101,14 @@ class Peer:
     def heartbeat(self):
         while self.isTracker and self.active:
             print(f"peers para enviar heartbeat: {self.peers}")
-            for nome, peer_uri in self.peers.items():                         # enviar a epoca aqui, assim o peer sabe se eh da epoca que ele esta esperando ou nao
-                try:                                            # e caso nao seja ele pode fazer todo o processo de se cadastrar no tracker 
-                    with Pyro5.api.Proxy(peer_uri) as peer:
-                        print(f"enviando heartbeat para {nome}")
-                        peer.receberHeartbeat(self.trackerNome, self.epoca)
-                except Pyro5.errors.CommunicationError:
-                    print(f"{self.nome} nao conseguiu enviar heartbeat para {peer_uri}")
+            for nome, peer_uri in self.peers.items():
+                if nome != self.nome:
+                    try:
+                        with Pyro5.api.Proxy(peer_uri) as peer:
+                            print(f"enviando heartbeat para {nome}")
+                            peer.receberHeartbeat(self.trackerNome, self.epoca)
+                    except Pyro5.errors.CommunicationError:
+                        print(f"{self.nome} nao conseguiu enviar heartbeat para {peer_uri}")
             
             time.sleep(TRACKER_HEARTBEAT_INTERVAL)
     
@@ -123,14 +126,14 @@ class Peer:
     def verificarTracker(self):
         while self.active and not self.isTracker:
             if self.trackerUri:
-                timeout = random.uniform(*NODE_TIMEOUT_RANGE)
                 elapsed = time.time() - self.lastHeartbeat
                 print(elapsed)
-                print(timeout)
-                if elapsed > timeout:
+                print(self.timeout)
+                if elapsed > self.timeout:
                     print(f"{self.nome} detectou falha do tracker.")
                     print(self.peers)
                     print(self.trackerNome)
+
                     # removendo tracker da lista de peers ativos
                     del self.peers[self.trackerNome]
 
@@ -145,7 +148,7 @@ class Peer:
                 self.iniciarEleicao()
                 break
 
-            time.sleep(timeout)
+            time.sleep(self.timeout)
 
     @Pyro5.api.expose
     def pedirVoto(self, candidato, epoca):
@@ -158,8 +161,34 @@ class Peer:
                 self.jaVotou = True
                 print(f"{self.nome} votou para o {candidato} na epoca {epoca}")
                 return True
+            
+    @Pyro5.api.expose
+    def iniciouEleicao(self):
+        if self.eleicaoRodando:
+            return True
+        return False
 
     def iniciarEleicao(self):
+        # verificar se a eleicao ja nao foi iniciada por outro peer
+        with Pyro5.api.locate_ns() as ns:
+            self.peers = ns.list()
+            print(f"peers no ns ao rodar eleicao: {self.peers}")
+            
+            primeiro_item = list(peer.peers.items())[0]
+            del peer.peers[primeiro_item[0]]
+
+        for peerNome, peerUri in self.peers.items():
+            if peerNome != self.nome:
+                try:
+                    with Pyro5.api.Proxy(peerUri) as peerProxy:
+                        print(f"Verificando eleição em {peerNome} com URI {peerUri}")
+                        if peerProxy.iniciouEleicao():
+                            return
+                except Pyro5.errors.CommunicationError:
+                    print(f"{peerNome} nao encontrado")
+
+        self.eleicaoRodando = True
+
         if not self.jaVotou:
             self.epoca += 1
             votos = [self.nome]
@@ -167,16 +196,18 @@ class Peer:
             print(f"{self.nome} iniciou uma eleicao para a epoca {self.epoca}")
             print(f"peers ativos: {self.peers}")
             for peerNome, peerUri in self.peers.items():
-                try:
-                    with Pyro5.api.Proxy(peerUri) as peerProxy:
-                        if peerProxy.pedirVoto(self.nome, self.epoca):
-                            votos.append(peerNome)
-                except Pyro5.errors.CommunicationError:
-                    print(f"{self.nome} nao encontrou {peerUri} para a eleicao")
+                if peerNome != self.nome:
+                    try:
+                        with Pyro5.api.Proxy(peerUri) as peerProxy:
+                            if peerProxy.pedirVoto(self.nome, self.epoca):
+                                votos.append(peerNome)
+                    except Pyro5.errors.CommunicationError:
+                        print(f"{self.nome} nao encontrou {peerUri} para a eleicao")
             
             if len(votos) > len(self.peers) // 2:
                 self.isTracker = True
                 self.arquivosPeers = {}
+                self.arquivosPeers[self.nome] = self.arquivos
                 print(f"{self.nome} agora eh o tracker para a epoca {self.epoca}")
 
                 # registra novo tracker para a epoca no servidor de nomes
@@ -186,18 +217,23 @@ class Peer:
                     ns.register(self.trackerNome, self.uri)
                     print(f"{self.trackerNome} registrado com URI {self.uri}")
 
+                self.peers[self.trackerNome] = self.peers.pop(self.nome)
+                self.arquivosPeers[self.trackerNome] = self.arquivosPeers.pop(self.nome)
+                self.nome = self.trackerNome
+
                 # avisa os peers que eh o novo tracker
                 for peerNome, peerUri in self.peers.items():
-                    try:
-                        with Pyro5.api.Proxy(peerUri) as peerProxy:
-                            peerProxy.reconhecerNovoTracker(self.trackerNome, self.uri)
-                            print(f"{peerNome} reconheceu o novo Tracker {self.trackerNome}")
-                    except Pyro5.errors.CommunicationError:
-                        print(f"{peerNome} nao reconheceu o novo tracker {self.trackerNome}")
+                    if peerNome != self.nome:
+                        try:
+                            with Pyro5.api.Proxy(peerUri) as peerProxy:
+                                peerProxy.reconhecerNovoTracker(self.trackerNome, self.uri)
+                                print(f"{peerNome} reconheceu o novo Tracker {self.trackerNome}")
+                        except Pyro5.errors.CommunicationError:
+                            print(f"{peerNome} nao reconheceu o novo tracker {self.trackerNome}")
 
                 threading.Thread(target=self.heartbeat).start()
-        else:
-            self.verificarTracker()
+
+        self.eleicaoRodando = False
 
     @Pyro5.api.expose
     def reconhecerNovoTracker(self, trackerNome, trackerUri):
@@ -254,15 +290,15 @@ if __name__ == "__main__":
         uri = daemon.register(peer)
         peer.uri = uri
         with Pyro5.api.locate_ns() as ns:
+            ns.register(peer_nome, uri)
+            print(f"{peer_nome} registrado com uri {uri}")
+
             peer.peers = ns.list()
             print(f"peers no ns: {peer.peers}")
-            
+
             primeiro_item = list(peer.peers.items())[0]
             del peer.peers[primeiro_item[0]] 
             print(peer.peers)
-            
-            ns.register(peer_nome, uri)
-            print(f"{peer_nome} registrado com uri {uri}")
         
         for nome, uri in peer.peers.items():
             print(nome)
