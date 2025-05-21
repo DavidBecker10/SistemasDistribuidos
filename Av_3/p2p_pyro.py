@@ -49,15 +49,15 @@ class Peer:
                     if possuemArquivo:
                         print(f"{self.nome} encontrou o arquivo com: {possuemArquivo}")
                         peerEscolhido = random.choice(possuemArquivo)
-                        with Pyro5.api.Proxy(peerEscolhido) as peerProxy:
+                        uriPeerEscolhido = self.peers[peerEscolhido]
+                        with Pyro5.api.Proxy(uriPeerEscolhido) as peerProxy:
                             dados = peerProxy.enviarArquivo(nomeArquivo)
                             if dados:
                                 with open(os.path.join(self.pasta, f"recebido_{nomeArquivo}"), "wb") as f:
                                     f.write(dados)
                                 print(f"{self.nome} recebeu o arquivo '{nomeArquivo}' com sucesso de {peerEscolhido}")
                                 self.atualizarArquivos(nomeArquivo)
-                                return True
-                            else: 
+                            else:
                                 print(f"{self.nome} nao recebeu o arquivo '{nomeArquivo}' de {peerEscolhido}")
                     else:
                         print(f"Nenhum peer possui o arquivo desejado.")
@@ -86,7 +86,7 @@ class Peer:
                 try:                                            # e caso nao seja ele pode fazer todo o processo de se cadastrar no tracker 
                     with Pyro5.api.Proxy(peer_uri) as peer:
                         print(f"enviando heartbeat para {nome}")
-                        peer.receberHeartbeat(self.nome, self.epoca)
+                        peer.receberHeartbeat(self.trackerNome, self.epoca)
                 except Pyro5.errors.CommunicationError:
                     print(f"{self.nome} nao conseguiu enviar heartbeat para {peer_uri}")
             
@@ -100,7 +100,7 @@ class Peer:
         elif trackerEpoca > self.epoca:
             self.epoca = trackerEpoca
             tracker = Pyro5.api.Proxy(f"PYRONAME:{trackerNome}")
-            tracker.cadastrarArquivos(peer.nome, peer.uri, peer.arquivos)
+            tracker.cadastrarArquivos(self.nome, self.uri, self.arquivos)
 
 
     def verificarTracker(self):
@@ -114,7 +114,14 @@ class Peer:
                     print(f"{self.nome} detectou falha do tracker.")
                     print(self.peers)
                     print(self.trackerNome)
+                    # removendo tracker da lista de peers ativos
                     del self.peers[self.trackerNome]
+
+                    # removendo tracker do servidor de nomes
+                    ns = Pyro5.api.locate_ns()
+                    ns.remove(self.trackerNome)
+                    self.trackerNome = None
+                    self.trackerUri = None
                     self.iniciarEleicao()
                     break
             else:
@@ -136,40 +143,42 @@ class Peer:
                 return True
 
     def iniciarEleicao(self):
-        self.epoca += 1
-        votos = [self.nome]
-        self.jaVotou = True
-        print(f"{self.nome} iniciou uma eleicao para a epoca {self.epoca}")
-        print(f"peers ativos: {self.peers}")
-        for nome, peerUri in self.peers.items():
-            try:
-                with Pyro5.api.Proxy(peerUri) as peerProxy:
-                    if peerProxy.pedirVoto(self.nome, self.epoca):
-                        votos.append(peerUri)
-            except Pyro5.errors.CommunicationError:
-                print(f"{self.nome} nao encontrou {peerUri} para a eleicao")
-        
-        if len(votos) > len(self.peers) // 2:
-            self.isTracker = True
-            self.arquivosPeers = {}
-            print(f"{self.nome} agora eh o tracker para a epoca {self.epoca}")
-
-            # registra novo tracker para a epoca no servidor de nomes
-            self.trackerNome = f"Tracker_Epoca_{self.epoca}"
-            with Pyro5.api.locate_ns() as ns:
-                ns.remove(self.nome)
-                ns.register(self.trackerNome, uri)
-                print(f"{self.trackerNome} registrado com URI {uri}")
-
-            threading.Thread(target=self.heartbeat).start()
-
-            # registra arquivos no novo tracker
-            for peerUri in self.peers.values():
+        if not self.jaVotou:
+            self.epoca += 1
+            votos = [self.nome]
+            self.jaVotou = True
+            print(f"{self.nome} iniciou uma eleicao para a epoca {self.epoca}")
+            print(f"peers ativos: {self.peers}")
+            for nome, peerUri in self.peers.items():
                 try:
                     with Pyro5.api.Proxy(peerUri) as peerProxy:
-                        peerProxy.cadastrarArquivos(self.nome, self.arquivos)
+                        if peerProxy.pedirVoto(self.nome, self.epoca):
+                            votos.append(peerUri)
                 except Pyro5.errors.CommunicationError:
-                    print(f"{self.nome} nao encontrou {peerUri}")
+                    print(f"{self.nome} nao encontrou {peerUri} para a eleicao")
+            
+            if len(votos) > len(self.peers) // 2:
+                self.isTracker = True
+                self.arquivosPeers = {}
+                print(f"{self.nome} agora eh o tracker para a epoca {self.epoca}")
+
+                # registra novo tracker para a epoca no servidor de nomes
+                self.trackerNome = f"Tracker_Epoca_{self.epoca}"
+                with Pyro5.api.locate_ns() as ns:
+                    ns.remove(self.nome)
+                    ns.register(self.trackerNome, self.uri)
+                    print(f"{self.trackerNome} registrado com URI {self.uri}")
+
+                threading.Thread(target=self.heartbeat).start()
+
+                # registra arquivos no novo tracker
+                '''for peerNome, peerUri in self.peers.items():
+                    try:
+                        with Pyro5.api.Proxy(peerUri) as peerProxy:
+                            peerProxy.cadastrarArquivos(self.nome, self.arquivos)
+                    except Pyro5.errors.CommunicationError:
+                        print(f"{self.nome} nao encontrou {peerUri}")'''
+                
         
     def atualizarArquivos(self, novoArquivo):
         self.arquivos.append(novoArquivo)
@@ -178,7 +187,7 @@ class Peer:
                 with Pyro5.api.Proxy(self.trackerUri) as trackerProxy:
                     trackerProxy.cadastrarArquivos(self.nome, self.arquivos)
             except Pyro5.errors.CommunicationError:
-                print(f"{self.noem} nao conseguiu atualizar o tracker com novos arquivos.")
+                print(f"{self.nome} nao conseguiu atualizar o tracker com novos arquivos.")
 
 if __name__ == "__main__":
     time.sleep(2)
@@ -218,9 +227,11 @@ if __name__ == "__main__":
         with Pyro5.api.locate_ns() as ns:
             peer.peers = ns.list()
             print(f"peers no ns: {peer.peers}")
+            
             primeiro_item = list(peer.peers.items())[0]
-            del peer.peers[primeiro_item[0]]
+            del peer.peers[primeiro_item[0]] 
             print(peer.peers)
+            
             ns.register(peer_nome, uri)
             print(f"{peer_nome} registrado com uri {uri}")
         
