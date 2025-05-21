@@ -220,7 +220,7 @@ class Peer:
                 self.peers[self.trackerNome] = self.peers.pop(self.nome)
                 self.arquivosPeers[self.trackerNome] = self.arquivosPeers.pop(self.nome)
                 self.nome = self.trackerNome
-
+                self.trackerUri = self.uri
                 # avisa os peers que eh o novo tracker
                 for peerNome, peerUri in self.peers.items():
                     if peerNome != self.nome:
