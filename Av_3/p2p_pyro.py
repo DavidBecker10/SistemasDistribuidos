@@ -4,6 +4,7 @@ import time
 import random
 import sys
 import os
+import base64
 
 TRACKER_HEARTBEAT_INTERVAL = 10
 NODE_TIMEOUT_RANGE = (15, 30)
@@ -48,17 +49,33 @@ class Peer:
                     possuemArquivo = trackerProxy.procurarArquivo(nomeArquivo)
                     if possuemArquivo:
                         print(f"{self.nome} encontrou o arquivo com: {possuemArquivo}")
+
+                        with Pyro5.api.locate_ns() as ns:
+                            for peerNome in possuemArquivo:
+                                if peerNome not in self.peers:
+                                    try:
+                                        self.peers[peerNome] = ns.lookup(peerNome)
+                                        print(f"Adicionado {peerNome} aos peers com URI {self.peers[peerNome]}")
+                                    except Pyro5.errors.NamingError:
+                                        print(f"Erro: Não foi possível localizar {peerNome} no servidor de nomes")
+                        
                         peerEscolhido = random.choice(possuemArquivo)
                         uriPeerEscolhido = self.peers[peerEscolhido]
                         with Pyro5.api.Proxy(uriPeerEscolhido) as peerProxy:
                             dados = peerProxy.enviarArquivo(nomeArquivo)
-                            if dados:
-                                with open(os.path.join(self.pasta, f"recebido_{nomeArquivo}"), "wb") as f:
-                                    f.write(dados)
-                                print(f"{self.nome} recebeu o arquivo '{nomeArquivo}' com sucesso de {peerEscolhido}")
-                                self.atualizarArquivos(nomeArquivo)
+
+                            if isinstance(dados, dict) and "data" in dados and "encoding" in dados:
+                                if dados["encoding"] == "base64":
+                                    dados_decodificados = base64.b64decode(dados["data"])
+                                    with open(os.path.join(self.pasta, f"recebido_{nomeArquivo}"), "wb") as f:
+                                        f.write(dados_decodificados)
+                                    print(f"{self.nome} recebeu o arquivo '{nomeArquivo}' com sucesso de {peerEscolhido}")
+                                    self.atualizarArquivos(nomeArquivo)
+                                else:
+                                    print(f"Codificação desconhecida: {dados['encoding']}")
                             else:
-                                print(f"{self.nome} nao recebeu o arquivo '{nomeArquivo}' de {peerEscolhido}")
+                                print(f"Dados inválidos recebidos de {peerEscolhido}")
+                                
                     else:
                         print(f"Nenhum peer possui o arquivo desejado.")
 
@@ -149,11 +166,11 @@ class Peer:
             self.jaVotou = True
             print(f"{self.nome} iniciou uma eleicao para a epoca {self.epoca}")
             print(f"peers ativos: {self.peers}")
-            for nome, peerUri in self.peers.items():
+            for peerNome, peerUri in self.peers.items():
                 try:
                     with Pyro5.api.Proxy(peerUri) as peerProxy:
                         if peerProxy.pedirVoto(self.nome, self.epoca):
-                            votos.append(peerUri)
+                            votos.append(peerNome)
                 except Pyro5.errors.CommunicationError:
                     print(f"{self.nome} nao encontrou {peerUri} para a eleicao")
             
@@ -169,23 +186,35 @@ class Peer:
                     ns.register(self.trackerNome, self.uri)
                     print(f"{self.trackerNome} registrado com URI {self.uri}")
 
-                threading.Thread(target=self.heartbeat).start()
-
-                # registra arquivos no novo tracker
-                '''for peerNome, peerUri in self.peers.items():
+                # avisa os peers que eh o novo tracker
+                for peerNome, peerUri in self.peers.items():
                     try:
                         with Pyro5.api.Proxy(peerUri) as peerProxy:
-                            peerProxy.cadastrarArquivos(self.nome, self.arquivos)
+                            peerProxy.reconhecerNovoTracker(self.trackerNome, self.uri)
+                            print(f"{peerNome} reconheceu o novo Tracker {self.trackerNome}")
                     except Pyro5.errors.CommunicationError:
-                        print(f"{self.nome} nao encontrou {peerUri}")'''
-                
+                        print(f"{peerNome} nao reconheceu o novo tracker {self.trackerNome}")
+
+                threading.Thread(target=self.heartbeat).start()
+        else:
+            self.verificarTracker()
+
+    @Pyro5.api.expose
+    def reconhecerNovoTracker(self, trackerNome, trackerUri):
+        self.jaVotou = False
+        self.isTracker = False
+        self.trackerNome = trackerNome
+        self.trackerUri = trackerUri
+        self.peers[trackerNome] = trackerUri
+        self.peers = {nome: uri for nome, uri in self.peers.items() if not (nome.startswith("Tracker_Epoca_") and nome != self.trackerNome)}
+        self.lastHeartbeat = time.time()
         
     def atualizarArquivos(self, novoArquivo):
         self.arquivos.append(novoArquivo)
         if self.trackerUri:
             try:
                 with Pyro5.api.Proxy(self.trackerUri) as trackerProxy:
-                    trackerProxy.cadastrarArquivos(self.nome, self.arquivos)
+                    trackerProxy.cadastrarArquivos(self.nome, self.uri, self.arquivos)
             except Pyro5.errors.CommunicationError:
                 print(f"{self.nome} nao conseguiu atualizar o tracker com novos arquivos.")
 
