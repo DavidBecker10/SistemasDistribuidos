@@ -37,7 +37,7 @@ class Peer:
         if self.isTracker:
             self.peers[nomePeer] = uriPeer
             self.arquivosPeers[nomePeer] = arquivos
-            print(self.arquivosPeers)
+            #print(self.arquivosPeers)
 
     @Pyro5.api.expose
     def procurarArquivo(self, nomeArquivo):
@@ -100,20 +100,20 @@ class Peer:
 
     def heartbeat(self):
         while self.isTracker and self.active:
-            print(f"peers para enviar heartbeat: {self.peers}")
+            #print(f"peers para enviar heartbeat: {self.peers}")
             for nome, peer_uri in self.peers.items():
                 if nome != self.nome:
                     try:
                         with Pyro5.api.Proxy(peer_uri) as peer:
                             print(f"enviando heartbeat para {nome}")
-                            peer.receberHeartbeat(self.trackerNome, self.epoca)
+                            peer.receberHeartbeat(self.trackerNome, self.trackerUri, self.epoca)
                     except Pyro5.errors.CommunicationError:
                         print(f"{self.nome} nao conseguiu enviar heartbeat para {peer_uri}")
             
             time.sleep(TRACKER_HEARTBEAT_INTERVAL)
     
     @Pyro5.api.expose
-    def receberHeartbeat(self, trackerNome, trackerEpoca):
+    def receberHeartbeat(self, trackerNome, trackerUri, trackerEpoca):
         if trackerEpoca == self.epoca:
             self.lastHeartbeat = time.time()
             print(f"{self.nome} recebeu heartbeat do tracker {trackerNome}")
@@ -121,18 +121,24 @@ class Peer:
             self.epoca = trackerEpoca
             tracker = Pyro5.api.Proxy(f"PYRONAME:{trackerNome}")
             tracker.cadastrarArquivos(self.nome, self.uri, self.arquivos)
-
+            self.jaVotou = False
+            self.isTracker = False
+            self.trackerNome = trackerNome
+            self.trackerUri = trackerUri
+            self.peers[trackerNome] = trackerUri
+            self.peers = {nome: uri for nome, uri in self.peers.items() if not (nome.startswith("Tracker_Epoca_") and nome != self.trackerNome)}
+            self.lastHeartbeat = time.time()
 
     def verificarTracker(self):
         while self.active and not self.isTracker:
             if self.trackerUri:
                 elapsed = time.time() - self.lastHeartbeat
-                print(elapsed)
-                print(self.timeout)
+                #print(elapsed)
+                #print(self.timeout)
                 if elapsed > self.timeout:
                     print(f"{self.nome} detectou falha do tracker.")
-                    print(self.peers)
-                    print(self.trackerNome)
+                    #print(self.peers)
+                    #print(self.trackerNome)
 
                     # removendo tracker da lista de peers ativos
                     del self.peers[self.trackerNome]
@@ -142,9 +148,11 @@ class Peer:
                     ns.remove(self.trackerNome)
                     self.trackerNome = None
                     self.trackerUri = None
+                    self.lastHeartbeat = time.time()
                     self.iniciarEleicao()
                     break
             else:
+                self.lastHeartbeat = time.time()
                 self.iniciarEleicao()
                 break
 
@@ -172,7 +180,7 @@ class Peer:
         # verificar se a eleicao ja nao foi iniciada por outro peer
         with Pyro5.api.locate_ns() as ns:
             self.peers = ns.list()
-            print(f"peers no ns ao rodar eleicao: {self.peers}")
+            #print(f"peers no ns ao rodar eleicao: {self.peers}")
             
             primeiro_item = list(peer.peers.items())[0]
             del peer.peers[primeiro_item[0]]
@@ -181,7 +189,7 @@ class Peer:
             if peerNome != self.nome:
                 try:
                     with Pyro5.api.Proxy(peerUri) as peerProxy:
-                        print(f"Verificando eleição em {peerNome} com URI {peerUri}")
+                        #print(f"Verificando eleição em {peerNome} com URI {peerUri}")
                         if peerProxy.iniciouEleicao():
                             return
                 except Pyro5.errors.CommunicationError:
@@ -194,7 +202,7 @@ class Peer:
             votos = [self.nome]
             self.jaVotou = True
             print(f"{self.nome} iniciou uma eleicao para a epoca {self.epoca}")
-            print(f"peers ativos: {self.peers}")
+            #print(f"peers ativos: {self.peers}")
             for peerNome, peerUri in self.peers.items():
                 if peerNome != self.nome:
                     try:
@@ -221,29 +229,10 @@ class Peer:
                 self.arquivosPeers[self.trackerNome] = self.arquivosPeers.pop(self.nome)
                 self.nome = self.trackerNome
                 self.trackerUri = self.uri
-                # avisa os peers que eh o novo tracker
-                for peerNome, peerUri in self.peers.items():
-                    if peerNome != self.nome:
-                        try:
-                            with Pyro5.api.Proxy(peerUri) as peerProxy:
-                                peerProxy.reconhecerNovoTracker(self.trackerNome, self.uri)
-                                print(f"{peerNome} reconheceu o novo Tracker {self.trackerNome}")
-                        except Pyro5.errors.CommunicationError:
-                            print(f"{peerNome} nao reconheceu o novo tracker {self.trackerNome}")
 
                 threading.Thread(target=self.heartbeat).start()
 
         self.eleicaoRodando = False
-
-    @Pyro5.api.expose
-    def reconhecerNovoTracker(self, trackerNome, trackerUri):
-        self.jaVotou = False
-        self.isTracker = False
-        self.trackerNome = trackerNome
-        self.trackerUri = trackerUri
-        self.peers[trackerNome] = trackerUri
-        self.peers = {nome: uri for nome, uri in self.peers.items() if not (nome.startswith("Tracker_Epoca_") and nome != self.trackerNome)}
-        self.lastHeartbeat = time.time()
         
     def atualizarArquivos(self, novoArquivo):
         self.arquivos.append(novoArquivo)
@@ -294,14 +283,14 @@ if __name__ == "__main__":
             print(f"{peer_nome} registrado com uri {uri}")
 
             peer.peers = ns.list()
-            print(f"peers no ns: {peer.peers}")
+            #print(f"peers no ns: {peer.peers}")
 
             primeiro_item = list(peer.peers.items())[0]
             del peer.peers[primeiro_item[0]] 
-            print(peer.peers)
+            #print(peer.peers)
         
         for nome, uri in peer.peers.items():
-            print(nome)
+            #print(nome)
             if "Tracker" in nome:
                 print(f"Encontrado: Nome = {nome}, URI = {uri}")
                 peer.trackerUri = uri
