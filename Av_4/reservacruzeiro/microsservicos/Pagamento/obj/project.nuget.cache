@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "NqBRMAG3Ki0=",
+  "dgSpecHash": "EEHmA/iqCJo=",
   "success": true,
-  "projectFilePath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Pagamento\\Pagamento.csproj",
+  "projectFilePath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Pagamento\\Pagamento.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\david\\.nuget\\packages\\rabbitmq.client\\7.1.2\\rabbitmq.client.7.1.2.nupkg.sha512",
     "C:\\Users\\david\\.nuget\\packages\\system.io.pipelines\\8.0.0\\system.io.pipelines.8.0.0.nupkg.sha512",

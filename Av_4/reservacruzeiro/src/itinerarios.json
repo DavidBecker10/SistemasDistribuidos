@@ -7,7 +7,8 @@
     "portoDesembarque": "Bahamas",
     "lugaresVisitados": ["Nassau", "Freeport", "CocoCay"],
     "numeroNoites": 7,
-    "valorPorPessoa": 1200
+    "valorPorPessoa": 1200,
+    "cabinesDisponiveis": 50
   },
   {
     "id": 2,
@@ -17,7 +18,8 @@
     "portoDesembarque": "Aruba",
     "lugaresVisitados": ["Curaçao", "Bonaire", "Aruba"],
     "numeroNoites": 10,
-    "valorPorPessoa": 1500
+    "valorPorPessoa": 1500,
+    "cabinesDisponiveis": 30
   },
   {
     "id": 3,
@@ -27,7 +29,8 @@
     "portoDesembarque": "Havaí",
     "lugaresVisitados": ["Maui", "Kauai", "Honolulu"],
     "numeroNoites": 14,
-    "valorPorPessoa": 2500
+    "valorPorPessoa": 2500,
+    "cabinesDisponiveis": 20
   },
   {
     "id": 4,
@@ -37,7 +40,8 @@
     "portoDesembarque": "Atenas",
     "lugaresVisitados": ["Roma", "Santorini", "Mykonos"],
     "numeroNoites": 12,
-    "valorPorPessoa": 2000
+    "valorPorPessoa": 2000,
+    "cabinesDisponiveis": 40
   },
   {
     "id": 5,
@@ -47,7 +51,8 @@
     "portoDesembarque": "Reykjavik",
     "lugaresVisitados": ["Copenhague", "Bergen", "Ilhas Faroe"],
     "numeroNoites": 10,
-    "valorPorPessoa": 2200
+    "valorPorPessoa": 2200,
+    "cabinesDisponiveis": 25
   },
   {
     "id": 6,
@@ -57,7 +62,8 @@
     "portoDesembarque": "Antártica",
     "lugaresVisitados": ["Ushuaia", "Ilhas Shetland", "Peninsula Antártica"],
     "numeroNoites": 14,
-    "valorPorPessoa": 3000
+    "valorPorPessoa": 3000,
+    "cabinesDisponiveis": 10
   },
   {
     "id": 7,
@@ -67,7 +73,8 @@
     "portoDesembarque": "Belém",
     "lugaresVisitados": ["Parintins", "Alter do Chão", "Macapá"],
     "numeroNoites": 7,
-    "valorPorPessoa": 1800
+    "valorPorPessoa": 1800,
+    "cabinesDisponiveis": 50
   },
   {
     "id": 8,
@@ -77,7 +84,8 @@
     "portoDesembarque": "Fiji",
     "lugaresVisitados": ["Noumea", "Vanuatu", "Fiji"],
     "numeroNoites": 10,
-    "valorPorPessoa": 2300
+    "valorPorPessoa": 2300,
+    "cabinesDisponiveis": 15
   },
   {
     "id": 9,
@@ -87,7 +95,8 @@
     "portoDesembarque": "Hong Kong",
     "lugaresVisitados": ["Bangkok", "Ho Chi Minh", "Hanoi"],
     "numeroNoites": 14,
-    "valorPorPessoa": 2600
+    "valorPorPessoa": 2600,
+    "cabinesDisponiveis": 20
   },
   {
     "id": 10,
@@ -97,7 +106,8 @@
     "portoDesembarque": "Maldivas",
     "lugaresVisitados": ["Goa", "Cochin", "Male"],
     "numeroNoites": 10,
-    "valorPorPessoa": 2100
+    "valorPorPessoa": 2100,
+    "cabinesDisponiveis": 25
   },
   {
     "id": 11,
@@ -107,7 +117,8 @@
     "portoDesembarque": "Durban",
     "lugaresVisitados": ["Port Elizabeth", "East London", "Durban"],
     "numeroNoites": 7,
-    "valorPorPessoa": 1700
+    "valorPorPessoa": 1700,
+    "cabinesDisponiveis": 40
   },
   {
     "id": 12,
@@ -117,7 +128,8 @@
     "portoDesembarque": "Buenos Aires",
     "lugaresVisitados": ["São Paulo", "Montevidéu", "Buenos Aires"],
     "numeroNoites": 10,
-    "valorPorPessoa": 1900
+    "valorPorPessoa": 1900,
+    "cabinesDisponiveis": 30
   },
   {
     "id": 13,
@@ -127,7 +139,8 @@
     "portoDesembarque": "Ilhas Svalbard",
     "lugaresVisitados": ["Groenlândia", "Jan Mayen", "Svalbard"],
     "numeroNoites": 12,
-    "valorPorPessoa": 2900
+    "valorPorPessoa": 2900,
+    "cabinesDisponiveis": 10
   },
   {
     "id": 14,
@@ -137,7 +150,8 @@
     "portoDesembarque": "Panamá",
     "lugaresVisitados": ["Acapulco", "Costa Rica", "Canal do Panamá"],
     "numeroNoites": 10,
-    "valorPorPessoa": 2400
+    "valorPorPessoa": 2400,
+    "cabinesDisponiveis": 15
   },
   {
     "id": 15,
@@ -147,7 +161,8 @@
     "portoDesembarque": "Egito",
     "lugaresVisitados": ["Omã", "Jordânia", "Sharm El-Sheikh"],
     "numeroNoites": 8,
-    "valorPorPessoa": 2000
+    "valorPorPessoa": 2000,
+    "cabinesDisponiveis": 20
   },
   {
     "id": 16,
@@ -157,7 +172,8 @@
     "portoDesembarque": "San Juan",
     "lugaresVisitados": ["Havana", "Santo Domingo", "San Juan"],
     "numeroNoites": 7,
-    "valorPorPessoa": 1600
+    "valorPorPessoa": 1600,
+    "cabinesDisponiveis": 40
   },
   {
     "id": 17,
@@ -167,7 +183,8 @@
     "portoDesembarque": "Sydney",
     "lugaresVisitados": ["Adelaide", "Melbourne", "Sydney"],
     "numeroNoites": 10,
-    "valorPorPessoa": 2500
+    "valorPorPessoa": 2500,
+    "cabinesDisponiveis": 20
   },
   {
     "id": 18,
@@ -177,7 +194,8 @@
     "portoDesembarque": "Kyoto",
     "lugaresVisitados": ["Osaka", "Hiroshima", "Nagasaki"],
     "numeroNoites": 7,
-    "valorPorPessoa": 2700
+    "valorPorPessoa": 2700,
+    "cabinesDisponiveis": 50
   },
   {
     "id": 19,
@@ -187,7 +205,8 @@
     "portoDesembarque": "Anchorage",
     "lugaresVisitados": ["Juneau", "Skagway", "Glacier Bay"],
     "numeroNoites": 12,
-    "valorPorPessoa": 2800
+    "valorPorPessoa": 2800,
+    "cabinesDisponiveis": 10
   },
   {
     "id": 20,
@@ -197,6 +216,7 @@
     "portoDesembarque": "São Petersburgo",
     "lugaresVisitados": ["Helsinque", "Tallinn", "São Petersburgo"],
     "numeroNoites": 9,
-    "valorPorPessoa": 2600
+    "valorPorPessoa": 2600,
+    "cabinesDisponiveis": 35
   }
 ]

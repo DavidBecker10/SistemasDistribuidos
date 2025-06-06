@@ -8,8 +8,8 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-var itinerariosJsonPath = "../../src/itinerarios.json";
 var publicKeyPath = "keys/public/public.key"; // Caminho da chave pública do Pagamento
+var itinerariosServiceUrl = "http://localhost:5001/api/itinerarios"; // URL do microsserviço de Itinerários
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -141,26 +141,30 @@ app.MapGet("/api/pagamento/status", async (HttpContext context) =>
     await context.Response.WriteAsync(JsonSerializer.Serialize(mensagens));
 });
 
-// Endpoint para obter itinerários
+// Endpoint para obter itinerários via microsserviço de Itinerários
 app.MapGet("/api/itinerarios", async (HttpContext context) =>
 {
     try
     {
-        if (!System.IO.File.Exists(itinerariosJsonPath))
-        {
-            context.Response.StatusCode = 404;
-            await context.Response.WriteAsync("Arquivo de itinerários não encontrado.");
-            return;
-        }
+        using var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync(itinerariosServiceUrl);
 
-        var itinerarios = await System.IO.File.ReadAllTextAsync(itinerariosJsonPath);
-        context.Response.ContentType = "application/json";
-        await context.Response.WriteAsync(itinerarios);
+        if (response.IsSuccessStatusCode)
+        {
+            var itinerarios = await response.Content.ReadAsStringAsync();
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(itinerarios);
+        }
+        else
+        {
+            context.Response.StatusCode = (int)response.StatusCode;
+            await context.Response.WriteAsync("Erro ao obter itinerários do microsserviço de Itinerários.");
+        }
     }
     catch (Exception ex)
     {
         context.Response.StatusCode = 500;
-        await context.Response.WriteAsync($"Erro ao carregar itinerários: {ex.Message}");
+        await context.Response.WriteAsync($"Erro ao conectar ao microsserviço de Itinerários: {ex.Message}");
     }
 });
 
@@ -191,7 +195,7 @@ Console.WriteLine(" [*] RabbitMQ consumer running...");
 Console.WriteLine(" [*] Waiting for messages. Access '/api/itinerarios' for itineraries.");
 Console.WriteLine(" [*] Access '/api/reserva/criar' to create a reservation.");
 
-await app.RunAsync();
+await app.RunAsync("http://localhost:5000");
 
 public class SignedMessage
 {

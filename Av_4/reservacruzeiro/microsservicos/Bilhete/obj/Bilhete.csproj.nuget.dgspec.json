@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Bilhete\\Bilhete.csproj": {}
+    "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Bilhete\\Bilhete.csproj": {}
   },
   "projects": {
-    "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Bilhete\\Bilhete.csproj": {
+    "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Bilhete\\Bilhete.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Bilhete\\Bilhete.csproj",
+        "projectUniqueName": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Bilhete\\Bilhete.csproj",
         "projectName": "Bilhete",
-        "projectPath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Bilhete\\Bilhete.csproj",
+        "projectPath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Bilhete\\Bilhete.csproj",
         "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Bilhete\\obj\\",
+        "outputPath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Bilhete\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config"
