@@ -26,8 +26,13 @@ app.UseCors("AllowAll");
 
 // Estrutura para representar itinerários
 var itinerarios = File.Exists(itinerariosJsonPath)
-    ? JsonSerializer.Deserialize<List<Itinerario>>(File.ReadAllText(itinerariosJsonPath)) ?? new List<Itinerario>()
+    ? JsonSerializer.Deserialize<List<Itinerario>>(File.ReadAllText(itinerariosJsonPath), new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    }) ?? new List<Itinerario>()
     : new List<Itinerario>();
+
+Console.WriteLine($"Itinerários carregados: {JsonSerializer.Serialize(itinerarios, new JsonSerializerOptions { WriteIndented = true })}");
 
 // Configurar RabbitMQ
 var factory = new ConnectionFactory { HostName = "localhost" };
@@ -49,12 +54,10 @@ consumerReservaCriada.ReceivedAsync += async (model, ea) =>
         var reserva = JsonSerializer.Deserialize<Reserva>(message);
         if (reserva != null)
         {
-            Console.WriteLine($"RESERVA: {reserva}");
             var itinerario = itinerarios.Find(i => i.Id == reserva.ItinerarioId);
-            Console.WriteLine($"ITINERARIO: {itinerario}");
-            if (itinerario != null && itinerario.CabinesDisponiveis >= reserva.NumeroPassageiros)
+            if (itinerario != null && itinerario.CabinesDisponiveis >= reserva.NumeroCabines)
             {
-                itinerario.CabinesDisponiveis -= reserva.NumeroPassageiros;
+                itinerario.CabinesDisponiveis -= reserva.NumeroCabines;
                 Console.WriteLine($"[Itinerário Atualizado] Reserva criada. ID: {reserva.ItinerarioId}, Cabines Disponíveis: {itinerario.CabinesDisponiveis}");
                 SalvarItinerarios(itinerarios, itinerariosJsonPath);
             }
@@ -81,7 +84,7 @@ consumerReservaCancelada.ReceivedAsync += async (model, ea) =>
             var itinerario = itinerarios.Find(i => i.Id == reserva.ItinerarioId);
             if (itinerario != null)
             {
-                itinerario.CabinesDisponiveis += reserva.NumeroPassageiros;
+                itinerario.CabinesDisponiveis += reserva.NumeroCabines;
                 Console.WriteLine($"[Itinerário Atualizado] Reserva cancelada. ID: {reserva.ItinerarioId}, Cabines Disponíveis: {itinerario.CabinesDisponiveis}");
                 SalvarItinerarios(itinerarios, itinerariosJsonPath);
             }
@@ -136,14 +139,19 @@ static void SalvarItinerarios(List<Itinerario> itinerarios, string path)
 public class Itinerario
 {
     public int Id { get; set; }
-    public string NomeNavio { get; set; } = string.Empty;
+    public List<string> DatasPartida { get; set; }
+    public string NomeNavio { get; set; }
+    public string PortoEmbarque { get; set; }
+    public string PortoDesembarque { get; set; }
+    public List<string> LugaresVisitados { get; set; }
+    public int NumeroNoites { get; set; }
+    public decimal ValorPorPessoa { get; set; }
     public int CabinesDisponiveis { get; set; }
-    public List<string> DatasPartida { get; set; } = new();
 }
 
 // Classe para representar reservas
 public class Reserva
 {
     public int ItinerarioId { get; set; }
-    public int NumeroPassageiros { get; set; }
+    public int NumeroCabines { get; set; }
 }

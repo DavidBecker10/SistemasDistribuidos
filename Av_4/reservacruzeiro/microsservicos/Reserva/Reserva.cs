@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 var publicKeyPath = "keys/public/public.key"; // Caminho da chave pública do Pagamento
 var itinerariosServiceUrl = "http://localhost:5001/api/itinerarios"; // URL do microsserviço de Itinerários
+var reservasJsonPath = "reservas.json"; // Arquivo para armazenar as reservas
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -34,6 +36,7 @@ using var channel = await connection.CreateChannelAsync();
 
 // exchange "direct_pagamento"
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
+await channel.QueueDeclareAsync(queue: "reserva-cancelada", durable: true, exclusive: false, autoDelete: false);
 
 // chave publica do Pagamento
 if (!File.Exists(publicKeyPath))
@@ -60,6 +63,12 @@ bool VerifySignature(string message, string signature)
         return false;
     }
 }
+
+List<dynamic> reservas = File.Exists(reservasJsonPath)
+    ? JsonSerializer.Deserialize<List<dynamic>>(File.ReadAllText(reservasJsonPath)) ?? new List<dynamic>()
+    : new List<dynamic>();
+
+void SaveReservas() => File.WriteAllText(reservasJsonPath, JsonSerializer.Serialize(reservas));
 
 // Consumidor para a exchange com routing key "pagamento.aprovado"
 var consumerPagamentoAprovado = new AsyncEventingBasicConsumer(channel);
@@ -168,12 +177,21 @@ app.MapGet("/api/itinerarios", async (HttpContext context) =>
     }
 });
 
+app.MapGet("/api/reservas", async (HttpContext context) =>
+{
+    context.Response.ContentType = "application/json";
+    await context.Response.WriteAsync(JsonSerializer.Serialize(reservas));
+});
+
 // Endpoint para criar uma reserva
 app.MapPost("/api/reserva/criar", async (HttpContext context) =>
 {
     try
     {
         var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+        var reserva = JsonSerializer.Deserialize<dynamic>(body);
+        reservas.Add(reserva);
+        SaveReservas();
         Console.WriteLine($"[Reserva Criada] Dados recebidos: {body}");
 
         // Publicar mensagem na fila "reserva-criada"
@@ -188,6 +206,48 @@ app.MapPost("/api/reserva/criar", async (HttpContext context) =>
         Console.WriteLine($"Erro ao criar reserva: {ex.Message}");
         context.Response.StatusCode = 500;
         await context.Response.WriteAsync($"Erro ao criar reserva: {ex.Message}");
+    }
+});
+
+// Endpoint para cancelar uma reserva
+app.MapPost("/api/reserva/cancelar", async (HttpContext context) =>
+{
+    try
+    {
+        var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+        var cancelamento = JsonSerializer.Deserialize<JsonElement>(body);
+
+        if (!cancelamento.TryGetProperty("Id", out JsonElement idElement))
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync("Campo 'Id' não encontrado no cancelamento.");
+            return;
+        }
+
+        var id = idElement.GetString();
+        if (string.IsNullOrEmpty(id))
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync("Id inválido no cancelamento.");
+            return;
+        }
+
+        Console.WriteLine($"Cancelamento recebido: {id}");
+
+        reservas.RemoveAll(r => r.GetProperty("Id").GetString() == id);
+        SaveReservas();
+
+        var bodyBytes = Encoding.UTF8.GetBytes(body);
+        await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "reserva-cancelada", body: bodyBytes);
+
+        context.Response.StatusCode = 201;
+        await context.Response.WriteAsync("Reserva cancelada com sucesso!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Erro ao cancelar reserva: {ex.Message}");
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync($"Erro ao cancelar reserva: {ex.Message}");
     }
 });
 

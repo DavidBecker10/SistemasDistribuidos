@@ -1,222 +1,382 @@
 [
   {
-    "id": 1,
-    "datasPartida": ["01/05/2025", "15/05/2025", "29/05/2025"],
-    "nomeNavio": "Ocean Explorer",
-    "portoEmbarque": "Miami",
-    "portoDesembarque": "Bahamas",
-    "lugaresVisitados": ["Nassau", "Freeport", "CocoCay"],
-    "numeroNoites": 7,
-    "valorPorPessoa": 1200,
-    "cabinesDisponiveis": 50
+    "Id": 1,
+    "DatasPartida": [
+      "01/05/2025",
+      "15/05/2025",
+      "29/05/2025"
+    ],
+    "NomeNavio": "Ocean Explorer",
+    "PortoEmbarque": "Miami",
+    "PortoDesembarque": "Bahamas",
+    "LugaresVisitados": [
+      "Nassau",
+      "Freeport",
+      "CocoCay"
+    ],
+    "NumeroNoites": 7,
+    "ValorPorPessoa": 1200,
+    "CabinesDisponiveis": 47
   },
   {
-    "id": 2,
-    "datasPartida": ["10/06/2025", "24/06/2025", "08/07/2025"],
-    "nomeNavio": "Caribbean Voyager",
-    "portoEmbarque": "San Juan",
-    "portoDesembarque": "Aruba",
-    "lugaresVisitados": ["Curaçao", "Bonaire", "Aruba"],
-    "numeroNoites": 10,
-    "valorPorPessoa": 1500,
-    "cabinesDisponiveis": 30
+    "Id": 2,
+    "DatasPartida": [
+      "10/06/2025",
+      "24/06/2025",
+      "08/07/2025"
+    ],
+    "NomeNavio": "Caribbean Voyager",
+    "PortoEmbarque": "San Juan",
+    "PortoDesembarque": "Aruba",
+    "LugaresVisitados": [
+      "Curacao",
+      "Bonaire",
+      "Aruba"
+    ],
+    "NumeroNoites": 10,
+    "ValorPorPessoa": 1500,
+    "CabinesDisponiveis": 30
   },
   {
-    "id": 3,
-    "datasPartida": ["15/07/2025", "29/07/2025", "12/08/2025"],
-    "nomeNavio": "Island Hopper",
-    "portoEmbarque": "Los Angeles",
-    "portoDesembarque": "Havaí",
-    "lugaresVisitados": ["Maui", "Kauai", "Honolulu"],
-    "numeroNoites": 14,
-    "valorPorPessoa": 2500,
-    "cabinesDisponiveis": 20
+    "Id": 3,
+    "DatasPartida": [
+      "15/07/2025",
+      "29/07/2025",
+      "12/08/2025"
+    ],
+    "NomeNavio": "Island Hopper",
+    "PortoEmbarque": "Los Angeles",
+    "PortoDesembarque": "Havaa",
+    "LugaresVisitados": [
+      "Maui",
+      "Kauai",
+      "Honolulu"
+    ],
+    "NumeroNoites": 14,
+    "ValorPorPessoa": 2500,
+    "CabinesDisponiveis": 17
   },
   {
-    "id": 4,
-    "datasPartida": ["05/05/2025", "19/05/2025", "02/06/2025"],
-    "nomeNavio": "Mediterranean Dream",
-    "portoEmbarque": "Barcelona",
-    "portoDesembarque": "Atenas",
-    "lugaresVisitados": ["Roma", "Santorini", "Mykonos"],
-    "numeroNoites": 12,
-    "valorPorPessoa": 2000,
-    "cabinesDisponiveis": 40
+    "Id": 4,
+    "DatasPartida": [
+      "05/05/2025",
+      "19/05/2025",
+      "02/06/2025"
+    ],
+    "NomeNavio": "Mediterranean Dream",
+    "PortoEmbarque": "Barcelona",
+    "PortoDesembarque": "Atenas",
+    "LugaresVisitados": [
+      "Roma",
+      "Santorini",
+      "Mykonos"
+    ],
+    "NumeroNoites": 12,
+    "ValorPorPessoa": 2000,
+    "CabinesDisponiveis": 40
   },
   {
-    "id": 5,
-    "datasPartida": ["01/08/2025", "15/08/2025", "29/08/2025"],
-    "nomeNavio": "Nordic Adventure",
-    "portoEmbarque": "Oslo",
-    "portoDesembarque": "Reykjavik",
-    "lugaresVisitados": ["Copenhague", "Bergen", "Ilhas Faroe"],
-    "numeroNoites": 10,
-    "valorPorPessoa": 2200,
-    "cabinesDisponiveis": 25
+    "Id": 5,
+    "DatasPartida": [
+      "01/08/2025",
+      "15/08/2025",
+      "29/08/2025"
+    ],
+    "NomeNavio": "Nordic Adventure",
+    "PortoEmbarque": "Oslo",
+    "PortoDesembarque": "Reykjavik",
+    "LugaresVisitados": [
+      "Copenhague",
+      "Bergen",
+      "Ilhas Faroe"
+    ],
+    "NumeroNoites": 10,
+    "ValorPorPessoa": 2200,
+    "CabinesDisponiveis": 19
   },
   {
-    "id": 6,
-    "datasPartida": ["05/09/2025", "19/09/2025", "03/10/2025"],
-    "nomeNavio": "Antarctic Explorer",
-    "portoEmbarque": "Buenos Aires",
-    "portoDesembarque": "Antártica",
-    "lugaresVisitados": ["Ushuaia", "Ilhas Shetland", "Peninsula Antártica"],
-    "numeroNoites": 14,
-    "valorPorPessoa": 3000,
-    "cabinesDisponiveis": 10
+    "Id": 6,
+    "DatasPartida": [
+      "05/09/2025",
+      "19/09/2025",
+      "03/10/2025"
+    ],
+    "NomeNavio": "Antarctic Explorer",
+    "PortoEmbarque": "Buenos Aires",
+    "PortoDesembarque": "Antartica",
+    "LugaresVisitados": [
+      "Ushuaia",
+      "Ilhas Shetland",
+      "Peninsula Antartica"
+    ],
+    "NumeroNoites": 14,
+    "ValorPorPessoa": 3000,
+    "CabinesDisponiveis": 10
   },
   {
-    "id": 7,
-    "datasPartida": ["01/11/2025", "15/11/2025", "29/11/2025"],
-    "nomeNavio": "Amazon Discovery",
-    "portoEmbarque": "Manaus",
-    "portoDesembarque": "Belém",
-    "lugaresVisitados": ["Parintins", "Alter do Chão", "Macapá"],
-    "numeroNoites": 7,
-    "valorPorPessoa": 1800,
-    "cabinesDisponiveis": 50
+    "Id": 7,
+    "DatasPartida": [
+      "01/11/2025",
+      "15/11/2025",
+      "29/11/2025"
+    ],
+    "NomeNavio": "Amazon Discovery",
+    "PortoEmbarque": "Manaus",
+    "PortoDesembarque": "Belem",
+    "LugaresVisitados": [
+      "Parintins",
+      "Alter do Chao",
+      "Macapa"
+    ],
+    "NumeroNoites": 7,
+    "ValorPorPessoa": 1800,
+    "CabinesDisponiveis": 50
   },
   {
-    "id": 8,
-    "datasPartida": ["10/12/2025", "24/12/2025", "07/01/2026"],
-    "nomeNavio": "Pacific Explorer",
-    "portoEmbarque": "Sydney",
-    "portoDesembarque": "Fiji",
-    "lugaresVisitados": ["Noumea", "Vanuatu", "Fiji"],
-    "numeroNoites": 10,
-    "valorPorPessoa": 2300,
-    "cabinesDisponiveis": 15
+    "Id": 8,
+    "DatasPartida": [
+      "10/12/2025",
+      "24/12/2025",
+      "07/01/2026"
+    ],
+    "NomeNavio": "Pacific Explorer",
+    "PortoEmbarque": "Sydney",
+    "PortoDesembarque": "Fiji",
+    "LugaresVisitados": [
+      "Noumea",
+      "Vanuatu",
+      "Fiji"
+    ],
+    "NumeroNoites": 10,
+    "ValorPorPessoa": 2300,
+    "CabinesDisponiveis": 15
   },
   {
-    "id": 9,
-    "datasPartida": ["01/03/2025", "15/03/2025", "29/03/2025"],
-    "nomeNavio": "Asian Serenity",
-    "portoEmbarque": "Singapura",
-    "portoDesembarque": "Hong Kong",
-    "lugaresVisitados": ["Bangkok", "Ho Chi Minh", "Hanoi"],
-    "numeroNoites": 14,
-    "valorPorPessoa": 2600,
-    "cabinesDisponiveis": 20
+    "Id": 9,
+    "DatasPartida": [
+      "01/03/2025",
+      "15/03/2025",
+      "29/03/2025"
+    ],
+    "NomeNavio": "Asian Serenity",
+    "PortoEmbarque": "Singapura",
+    "PortoDesembarque": "Hong Kong",
+    "LugaresVisitados": [
+      "Bangkok",
+      "Ho Chi Minh",
+      "Hanoi"
+    ],
+    "NumeroNoites": 14,
+    "ValorPorPessoa": 2600,
+    "CabinesDisponiveis": 20
   },
   {
-    "id": 10,
-    "datasPartida": ["05/04/2025", "19/04/2025", "03/05/2025"],
-    "nomeNavio": "Indian Ocean Gem",
-    "portoEmbarque": "Mumbai",
-    "portoDesembarque": "Maldivas",
-    "lugaresVisitados": ["Goa", "Cochin", "Male"],
-    "numeroNoites": 10,
-    "valorPorPessoa": 2100,
-    "cabinesDisponiveis": 25
+    "Id": 10,
+    "DatasPartida": [
+      "05/04/2025",
+      "19/04/2025",
+      "03/05/2025"
+    ],
+    "NomeNavio": "Indian Ocean Gem",
+    "PortoEmbarque": "Mumbai",
+    "PortoDesembarque": "Maldivas",
+    "LugaresVisitados": [
+      "Goa",
+      "Cochin",
+      "Male"
+    ],
+    "NumeroNoites": 10,
+    "ValorPorPessoa": 2100,
+    "CabinesDisponiveis": 25
   },
   {
-    "id": 11,
-    "datasPartida": ["01/05/2025", "15/05/2025", "29/05/2025"],
-    "nomeNavio": "African Horizons",
-    "portoEmbarque": "Cidade do Cabo",
-    "portoDesembarque": "Durban",
-    "lugaresVisitados": ["Port Elizabeth", "East London", "Durban"],
-    "numeroNoites": 7,
-    "valorPorPessoa": 1700,
-    "cabinesDisponiveis": 40
+    "Id": 11,
+    "DatasPartida": [
+      "01/05/2025",
+      "15/05/2025",
+      "29/05/2025"
+    ],
+    "NomeNavio": "African Horizons",
+    "PortoEmbarque": "Cidade do Cabo",
+    "PortoDesembarque": "Durban",
+    "LugaresVisitados": [
+      "Port Elizabeth",
+      "East London",
+      "Durban"
+    ],
+    "NumeroNoites": 7,
+    "ValorPorPessoa": 1700,
+    "CabinesDisponiveis": 38
   },
   {
-    "id": 12,
-    "datasPartida": ["10/06/2025", "24/06/2025", "08/07/2025"],
-    "nomeNavio": "South American Splendor",
-    "portoEmbarque": "Rio de Janeiro",
-    "portoDesembarque": "Buenos Aires",
-    "lugaresVisitados": ["São Paulo", "Montevidéu", "Buenos Aires"],
-    "numeroNoites": 10,
-    "valorPorPessoa": 1900,
-    "cabinesDisponiveis": 30
+    "Id": 12,
+    "DatasPartida": [
+      "10/06/2025",
+      "24/06/2025",
+      "08/07/2025"
+    ],
+    "NomeNavio": "South American Splendor",
+    "PortoEmbarque": "Rio de Janeiro",
+    "PortoDesembarque": "Buenos Aires",
+    "LugaresVisitados": [
+      "Sao Paulo",
+      "Montevideu",
+      "Buenos Aires"
+    ],
+    "NumeroNoites": 10,
+    "ValorPorPessoa": 1900,
+    "CabinesDisponiveis": 30
   },
   {
-    "id": 13,
-    "datasPartida": ["15/07/2025", "29/07/2025", "12/08/2025"],
-    "nomeNavio": "Arctic Circle",
-    "portoEmbarque": "Reykjavik",
-    "portoDesembarque": "Ilhas Svalbard",
-    "lugaresVisitados": ["Groenlândia", "Jan Mayen", "Svalbard"],
-    "numeroNoites": 12,
-    "valorPorPessoa": 2900,
-    "cabinesDisponiveis": 10
+    "Id": 13,
+    "DatasPartida": [
+      "15/07/2025",
+      "29/07/2025",
+      "12/08/2025"
+    ],
+    "NomeNavio": "Arctic Circle",
+    "PortoEmbarque": "Reykjavik",
+    "PortoDesembarque": "Ilhas Svalbard",
+    "LugaresVisitados": [
+      "Groenlandia",
+      "Jan Mayen",
+      "Svalbard"
+    ],
+    "NumeroNoites": 12,
+    "ValorPorPessoa": 2900,
+    "CabinesDisponiveis": 10
   },
   {
-    "id": 14,
-    "datasPartida": ["01/08/2025", "15/08/2025", "29/08/2025"],
-    "nomeNavio": "Panama Passage",
-    "portoEmbarque": "Los Angeles",
-    "portoDesembarque": "Panamá",
-    "lugaresVisitados": ["Acapulco", "Costa Rica", "Canal do Panamá"],
-    "numeroNoites": 10,
-    "valorPorPessoa": 2400,
-    "cabinesDisponiveis": 15
+    "Id": 14,
+    "DatasPartida": [
+      "01/08/2025",
+      "15/08/2025",
+      "29/08/2025"
+    ],
+    "NomeNavio": "Panama Passage",
+    "PortoEmbarque": "Los Angeles",
+    "PortoDesembarque": "Panama",
+    "LugaresVisitados": [
+      "Acapulco",
+      "Costa Rica",
+      "Canal do Panama"
+    ],
+    "NumeroNoites": 10,
+    "ValorPorPessoa": 2400,
+    "CabinesDisponiveis": 15
   },
   {
-    "id": 15,
-    "datasPartida": ["05/09/2025", "19/09/2025", "03/10/2025"],
-    "nomeNavio": "Red Sea Adventure",
-    "portoEmbarque": "Dubai",
-    "portoDesembarque": "Egito",
-    "lugaresVisitados": ["Omã", "Jordânia", "Sharm El-Sheikh"],
-    "numeroNoites": 8,
-    "valorPorPessoa": 2000,
-    "cabinesDisponiveis": 20
+    "Id": 15,
+    "DatasPartida": [
+      "05/09/2025",
+      "19/09/2025",
+      "03/10/2025"
+    ],
+    "NomeNavio": "Red Sea Adventure",
+    "PortoEmbarque": "Dubai",
+    "PortoDesembarque": "Egito",
+    "LugaresVisitados": [
+      "Oma",
+      "Jordania",
+      "Sharm El-Sheikh"
+    ],
+    "NumeroNoites": 8,
+    "ValorPorPessoa": 2000,
+    "CabinesDisponiveis": 20
   },
   {
-    "id": 16,
-    "datasPartida": ["01/11/2025", "15/11/2025", "29/11/2025"],
-    "nomeNavio": "Caribbean Bliss",
-    "portoEmbarque": "Fort Lauderdale",
-    "portoDesembarque": "San Juan",
-    "lugaresVisitados": ["Havana", "Santo Domingo", "San Juan"],
-    "numeroNoites": 7,
-    "valorPorPessoa": 1600,
-    "cabinesDisponiveis": 40
+    "Id": 16,
+    "DatasPartida": [
+      "01/11/2025",
+      "15/11/2025",
+      "29/11/2025"
+    ],
+    "NomeNavio": "Caribbean Bliss",
+    "PortoEmbarque": "Fort Lauderdale",
+    "PortoDesembarque": "San Juan",
+    "LugaresVisitados": [
+      "Havana",
+      "Santo Domingo",
+      "San Juan"
+    ],
+    "NumeroNoites": 7,
+    "ValorPorPessoa": 1600,
+    "CabinesDisponiveis": 40
   },
   {
-    "id": 17,
-    "datasPartida": ["10/12/2025", "24/12/2025", "07/01/2026"],
-    "nomeNavio": "Australia Coastline",
-    "portoEmbarque": "Perth",
-    "portoDesembarque": "Sydney",
-    "lugaresVisitados": ["Adelaide", "Melbourne", "Sydney"],
-    "numeroNoites": 10,
-    "valorPorPessoa": 2500,
-    "cabinesDisponiveis": 20
+    "Id": 17,
+    "DatasPartida": [
+      "10/12/2025",
+      "24/12/2025",
+      "07/01/2026"
+    ],
+    "NomeNavio": "Australia Coastline",
+    "PortoEmbarque": "Perth",
+    "PortoDesembarque": "Sydney",
+    "LugaresVisitados": [
+      "Adelaide",
+      "Melbourne",
+      "Sydney"
+    ],
+    "NumeroNoites": 10,
+    "ValorPorPessoa": 2500,
+    "CabinesDisponiveis": 20
   },
   {
-    "id": 18,
-    "datasPartida": ["01/03/2025", "15/03/2025", "29/03/2025"],
-    "nomeNavio": "Cherry Blossom Cruise",
-    "portoEmbarque": "Tóquio",
-    "portoDesembarque": "Kyoto",
-    "lugaresVisitados": ["Osaka", "Hiroshima", "Nagasaki"],
-    "numeroNoites": 7,
-    "valorPorPessoa": 2700,
-    "cabinesDisponiveis": 50
+    "Id": 18,
+    "DatasPartida": [
+      "01/03/2025",
+      "15/03/2025",
+      "29/03/2025"
+    ],
+    "NomeNavio": "Cherry Blossom Cruise",
+    "PortoEmbarque": "Toquio",
+    "PortoDesembarque": "Kyoto",
+    "LugaresVisitados": [
+      "Osaka",
+      "Hiroshima",
+      "Nagasaki"
+    ],
+    "NumeroNoites": 7,
+    "ValorPorPessoa": 2700,
+    "CabinesDisponiveis": 50
   },
   {
-    "id": 19,
-    "datasPartida": ["05/04/2025", "19/04/2025", "03/05/2025"],
-    "nomeNavio": "Alaskan Voyage",
-    "portoEmbarque": "Vancouver",
-    "portoDesembarque": "Anchorage",
-    "lugaresVisitados": ["Juneau", "Skagway", "Glacier Bay"],
-    "numeroNoites": 12,
-    "valorPorPessoa": 2800,
-    "cabinesDisponiveis": 10
+    "Id": 19,
+    "DatasPartida": [
+      "05/04/2025",
+      "19/04/2025",
+      "03/05/2025"
+    ],
+    "NomeNavio": "Alaskan Voyage",
+    "PortoEmbarque": "Vancouver",
+    "PortoDesembarque": "Anchorage",
+    "LugaresVisitados": [
+      "Juneau",
+      "Skagway",
+      "Glacier Bay"
+    ],
+    "NumeroNoites": 12,
+    "ValorPorPessoa": 2800,
+    "CabinesDisponiveis": 10
   },
   {
-    "id": 20,
-    "datasPartida": ["01/05/2025", "15/05/2025", "29/05/2025"],
-    "nomeNavio": "Baltic Treasures",
-    "portoEmbarque": "Estocolmo",
-    "portoDesembarque": "São Petersburgo",
-    "lugaresVisitados": ["Helsinque", "Tallinn", "São Petersburgo"],
-    "numeroNoites": 9,
-    "valorPorPessoa": 2600,
-    "cabinesDisponiveis": 35
+    "Id": 20,
+    "DatasPartida": [
+      "01/05/2025",
+      "15/05/2025",
+      "29/05/2025"
+    ],
+    "NomeNavio": "Baltic Treasures",
+    "PortoEmbarque": "Estocolmo",
+    "PortoDesembarque": "Sao Petersburgo",
+    "LugaresVisitados": [
+      "Helsinque",
+      "Tallinn",
+      "Sao Petersburgo"
+    ],
+    "NumeroNoites": 9,
+    "ValorPorPessoa": 2600,
+    "CabinesDisponiveis": 35
   }
 ]
