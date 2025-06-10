@@ -79,6 +79,7 @@ consumerReservaCancelada.ReceivedAsync += async (model, ea) =>
     try
     {
         var reserva = JsonSerializer.Deserialize<Reserva>(message);
+        Console.WriteLine(reserva.ItinerarioId);
         if (reserva != null)
         {
             var itinerario = itinerarios.Find(i => i.Id == reserva.ItinerarioId);

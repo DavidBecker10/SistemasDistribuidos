@@ -214,6 +214,7 @@ app.MapPost("/api/reserva/cancelar", async (HttpContext context) =>
 {
     try
     {
+        // Ler e desserializar o corpo da requisição
         var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
         var cancelamento = JsonSerializer.Deserialize<JsonElement>(body);
 
@@ -234,11 +235,33 @@ app.MapPost("/api/reserva/cancelar", async (HttpContext context) =>
 
         Console.WriteLine($"Cancelamento recebido: {id}");
 
+        // Localizar a reserva
+        var reservaElement = reservas.FirstOrDefault(r => r.GetProperty("Id").GetString() == id);
+        if (reservaElement.ValueKind == JsonValueKind.Undefined)
+        {
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsync("Reserva não encontrada.");
+            return;
+        }
+
+        // Obter dados da reserva
+        var reserva = new Reserva
+        {
+            ItinerarioId = reservaElement.GetProperty("ItinerarioId").GetInt32(),
+            NumeroCabines = reservaElement.GetProperty("NumeroCabines").GetInt32()
+        };
+
+        // Remover a reserva da lista e salvar no arquivo
         reservas.RemoveAll(r => r.GetProperty("Id").GetString() == id);
         SaveReservas();
 
-        var bodyBytes = Encoding.UTF8.GetBytes(body);
+        // Serializar e publicar na fila de cancelamento
+        var cancelBody = JsonSerializer.Serialize(reserva);
+        var bodyBytes = Encoding.UTF8.GetBytes(cancelBody);
+
         await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "reserva-cancelada", body: bodyBytes);
+
+        Console.WriteLine($"Reserva cancelada publicada: {cancelBody}");
 
         context.Response.StatusCode = 201;
         await context.Response.WriteAsync("Reserva cancelada com sucesso!");
@@ -261,4 +284,10 @@ public class SignedMessage
 {
     public string? Message { get; set; }
     public string? Signature { get; set; }
+}
+
+public class Reserva
+{
+    public int? ItinerarioId { get; set; }
+    public int? NumeroCabines { get; set; }
 }
