@@ -1,1 +1,10 @@
-[{"Id":"0a06ef91-abf8-4f83-847c-7c6440af1c1f","UserId":"e518b8f4-582d-458d-8520-86950d525249","Destino":"Havaa","DataEmbarque":"15/07/2025","NumeroCabines":3,"ItinerarioId":3},{"Id":"06c0dba7-cbf6-4eaa-9bf2-e6dff7c1630a","UserId":"e518b8f4-582d-458d-8520-86950d525249","Destino":"Atenas","DataEmbarque":"05/05/2025","NumeroCabines":3,"ItinerarioId":4}]
+[
+  {
+    "Id": "e4d3beb4-811b-41d7-9cd0-46c9be73d2f3",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "San Juan",
+    "DataEmbarque": "01/11/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 16
+  }
+]

@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Encodings.Web;
 
 var publicKeyPath = "keys/public/public.key"; // Caminho da chave pública do Pagamento
 var itinerariosServiceUrl = "http://localhost:5001/api/itinerarios"; // URL do microsserviço de Itinerários
@@ -64,11 +65,17 @@ bool VerifySignature(string message, string signature)
     }
 }
 
+var options = new JsonSerializerOptions
+{
+    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    WriteIndented = true // Opcional, para saída formatada
+};
+
 List<dynamic> reservas = File.Exists(reservasJsonPath)
     ? JsonSerializer.Deserialize<List<dynamic>>(File.ReadAllText(reservasJsonPath)) ?? new List<dynamic>()
     : new List<dynamic>();
 
-void SaveReservas() => File.WriteAllText(reservasJsonPath, JsonSerializer.Serialize(reservas));
+void SaveReservas() => File.WriteAllText(reservasJsonPath, JsonSerializer.Serialize(reservas, options));
 
 // Consumidor para a exchange com routing key "pagamento.aprovado"
 var consumerPagamentoAprovado = new AsyncEventingBasicConsumer(channel);
@@ -114,6 +121,56 @@ consumerPagamentoRecusado.ReceivedAsync += async (model, ea) =>
         {
             pagamentoStatus.Enqueue($"[Recusado] {signedMessage.Message}");
             Console.WriteLine($"[Reserva] Pagamento Recusado (mensagem assinada): {signedMessage.Message}");
+
+            var paymentInfo = JsonSerializer.Deserialize<JsonElement>(signedMessage.Message);
+
+            if (paymentInfo.GetProperty("Status").GetString() == "Recusado")
+            {
+                var originalMessage = JsonSerializer.Deserialize<JsonElement>(paymentInfo.GetProperty("OriginalMessage").GetString());
+
+                if (!originalMessage.TryGetProperty("Id", out JsonElement idElement))
+                {
+                    Console.WriteLine($"[Reserva] Erro ao cancelar reserva com pagamento recusado: Campo 'Id' não encontrado.");
+                    return;
+                }
+
+
+                var id = idElement.GetString();
+                if (string.IsNullOrEmpty(id))
+                {
+                    Console.WriteLine("Id inválido no cancelamento de pagamento recusado.");
+                    return;
+                }
+
+                Console.WriteLine($"Cancelamento recebido: {id}");
+
+                // Localizar a reserva
+                var reservaElement = reservas.FirstOrDefault(r => r.GetProperty("Id").GetString() == id);
+                if (reservaElement.ValueKind == JsonValueKind.Undefined)
+                {
+                    Console.WriteLine("Reserva não encontrada.");
+                    return;
+                }
+
+                // Obter dados da reserva
+                var reservaCanc = new Reserva
+                {
+                    ItinerarioId = reservaElement.GetProperty("ItinerarioId").GetInt32(),
+                    NumeroCabines = reservaElement.GetProperty("NumeroCabines").GetInt32()
+                };
+
+                // Remover a reserva da lista e salvar no arquivo
+                reservas.RemoveAll(r => r.GetProperty("Id").GetString() == id);
+                SaveReservas();
+
+                // Serializar e publicar na fila de cancelamento
+                var cancelBody = JsonSerializer.Serialize(reservaCanc, options);
+                var bodyBytes = Encoding.UTF8.GetBytes(cancelBody);
+
+                await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "reserva-cancelada", body: bodyBytes);
+
+                Console.WriteLine($"Reserva cancelada publicada: {cancelBody}");
+            }
         }
         else
         {
@@ -147,7 +204,7 @@ app.MapGet("/api/pagamento/status", async (HttpContext context) =>
 
     var mensagens = pagamentoStatus.ToArray();
     pagamentoStatus.Clear();
-    await context.Response.WriteAsync(JsonSerializer.Serialize(mensagens));
+    await context.Response.WriteAsync(JsonSerializer.Serialize(mensagens, options));
 });
 
 // Endpoint para obter itinerários via microsserviço de Itinerários
@@ -180,7 +237,7 @@ app.MapGet("/api/itinerarios", async (HttpContext context) =>
 app.MapGet("/api/reservas", async (HttpContext context) =>
 {
     context.Response.ContentType = "application/json";
-    await context.Response.WriteAsync(JsonSerializer.Serialize(reservas));
+    await context.Response.WriteAsync(JsonSerializer.Serialize(reservas, options));
 });
 
 // Endpoint para criar uma reserva
@@ -256,7 +313,7 @@ app.MapPost("/api/reserva/cancelar", async (HttpContext context) =>
         SaveReservas();
 
         // Serializar e publicar na fila de cancelamento
-        var cancelBody = JsonSerializer.Serialize(reserva);
+        var cancelBody = JsonSerializer.Serialize(reserva, options);
         var bodyBytes = Encoding.UTF8.GetBytes(cancelBody);
 
         await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "reserva-cancelada", body: bodyBytes);

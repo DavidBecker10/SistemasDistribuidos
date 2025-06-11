@@ -4,10 +4,17 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.IO;
+using System.Text.Encodings.Web;
 
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
+
+var options = new JsonSerializerOptions
+{
+    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    WriteIndented = true // Opcional, para saída formatada
+};
 
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
 
@@ -65,22 +72,22 @@ consumer.ReceivedAsync += async (model, ea) =>
         string routingKey = pagamentoAprovado ? "pagamento.aprovado" : "pagamento.recusado";
 
         var responseMessage = new { OriginalMessage = message, Status = pagamentoAprovado ? "Aprovado" : "Recusado" };
-        var messageBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(responseMessage));
+        var messageBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(responseMessage, options));
 
         // assinar a mensagem
         var signature = rsa.SignData(messageBody, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 
         var signedMessage = new
         {
-            Message = JsonSerializer.Serialize(responseMessage),
+            Message = JsonSerializer.Serialize(responseMessage, options),
             Signature = Convert.ToBase64String(signature)
         };
 
         // publica mensagem assinada na exchange
-        var responseBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(signedMessage));
+        var responseBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(signedMessage, options));
         await channel.BasicPublishAsync(exchange: "direct_pagamento", routingKey: routingKey, body: responseBody);
 
-        Console.WriteLine($" [x] Published to '{routingKey}': {JsonSerializer.Serialize(signedMessage)}");
+        Console.WriteLine($" [x] Published to '{routingKey}': {JsonSerializer.Serialize(signedMessage, options)}");
     }
     catch (Exception ex)
     {
