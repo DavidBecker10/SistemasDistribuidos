@@ -29,6 +29,9 @@ var app = builder.Build();
 
 app.UseCors("AllowAll");
 
+// Configuração para SSE
+var sseConnections = new ConcurrentBag<HttpResponse>();
+
 var pagamentoStatus = new ConcurrentQueue<string>();
 
 var factory = new ConnectionFactory { HostName = "localhost" };
@@ -65,6 +68,20 @@ bool VerifySignature(string message, string signature)
     }
 }
 
+// SSE Endpoint
+app.MapGet("/sse", async (HttpContext context) =>
+{
+    context.Response.Headers.Append("Cache-Control", "no-cache");
+    context.Response.Headers.Append("Content-Type", "text/event-stream");
+    context.Response.Headers.Append("Connection", "keep-alive");
+
+    sseConnections.Add(context.Response);
+
+    // Mantém a conexão aberta
+    await context.Response.Body.FlushAsync();
+    await Task.Delay(-1); // Bloqueia indefinidamente até a desconexão
+});
+
 var options = new JsonSerializerOptions
 {
     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
@@ -92,6 +109,17 @@ consumerPagamentoAprovado.ReceivedAsync += async (model, ea) =>
         {
             pagamentoStatus.Enqueue($"[Aprovado] {signedMessage.Message}");
             Console.WriteLine($"[Reserva] Pagamento Aprovado (mensagem assinada): {signedMessage.Message}");
+
+            var paymentInfo = JsonSerializer.Deserialize<JsonElement>(signedMessage.Message);
+            var originalMessage = JsonSerializer.Deserialize<JsonElement>(paymentInfo.GetProperty("OriginalMessage").GetString());
+
+            var sseMessage = $"event: pagamentoAprovado\ndata: {JsonSerializer.Serialize(originalMessage, options)}\n\n";
+
+            foreach (var response in sseConnections)
+            {
+                await response.WriteAsync(sseMessage);
+                await response.Body.FlushAsync();
+            }
         }
         else
         {
@@ -134,6 +162,13 @@ consumerPagamentoRecusado.ReceivedAsync += async (model, ea) =>
                     return;
                 }
 
+                var sseMessage = $"event: pagamentoRecusado\ndata: {JsonSerializer.Serialize(originalMessage, options)}\n\n";
+
+                foreach (var response in sseConnections)
+                {
+                    await response.WriteAsync(sseMessage);
+                    await response.Body.FlushAsync();
+                }
 
                 var id = idElement.GetString();
                 if (string.IsNullOrEmpty(id))

@@ -6,5 +6,29 @@
     "DataEmbarque": "01/11/2025",
     "NumeroCabines": 1,
     "ItinerarioId": 16
+  },
+  {
+    "Id": "f8d57506-970d-450d-aec9-329936734adc",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "15/05/2025",
+    "NumeroCabines": 3,
+    "ItinerarioId": 20
+  },
+  {
+    "Id": "412cedc4-9c57-4f34-b4bc-99547e119ced",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Anchorage",
+    "DataEmbarque": "05/04/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 19
+  },
+  {
+    "Id": "c7eaf1bb-11b8-46fc-819f-7b0cfc65a81a",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Kyoto",
+    "DataEmbarque": "01/03/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 18
   }
 ]
