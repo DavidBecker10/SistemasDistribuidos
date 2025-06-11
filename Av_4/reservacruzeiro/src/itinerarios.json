@@ -16,7 +16,7 @@
     ],
     "NumeroNoites": 7,
     "ValorPorPessoa": 1200,
-    "CabinesDisponiveis": 50
+    "CabinesDisponiveis": 55
   },
   {
     "Id": 2,
@@ -35,7 +35,7 @@
     ],
     "NumeroNoites": 10,
     "ValorPorPessoa": 1500,
-    "CabinesDisponiveis": 39
+    "CabinesDisponiveis": 44
   },
   {
     "Id": 3,
@@ -54,7 +54,7 @@
     ],
     "NumeroNoites": 14,
     "ValorPorPessoa": 2500,
-    "CabinesDisponiveis": 20
+    "CabinesDisponiveis": 18
   },
   {
     "Id": 4,
@@ -73,7 +73,7 @@
     ],
     "NumeroNoites": 12,
     "ValorPorPessoa": 2000,
-    "CabinesDisponiveis": 45
+    "CabinesDisponiveis": 49
   },
   {
     "Id": 5,
@@ -111,7 +111,7 @@
     ],
     "NumeroNoites": 14,
     "ValorPorPessoa": 3000,
-    "CabinesDisponiveis": 10
+    "CabinesDisponiveis": 13
   },
   {
     "Id": 7,
@@ -149,7 +149,7 @@
     ],
     "NumeroNoites": 10,
     "ValorPorPessoa": 2300,
-    "CabinesDisponiveis": 12
+    "CabinesDisponiveis": 16
   },
   {
     "Id": 9,
@@ -168,7 +168,7 @@
     ],
     "NumeroNoites": 14,
     "ValorPorPessoa": 2600,
-    "CabinesDisponiveis": 20
+    "CabinesDisponiveis": 21
   },
   {
     "Id": 10,
@@ -187,7 +187,7 @@
     ],
     "NumeroNoites": 10,
     "ValorPorPessoa": 2100,
-    "CabinesDisponiveis": 25
+    "CabinesDisponiveis": 26
   },
   {
     "Id": 11,
@@ -206,7 +206,7 @@
     ],
     "NumeroNoites": 7,
     "ValorPorPessoa": 1700,
-    "CabinesDisponiveis": 41
+    "CabinesDisponiveis": 42
   },
   {
     "Id": 12,
@@ -282,7 +282,7 @@
     ],
     "NumeroNoites": 8,
     "ValorPorPessoa": 2000,
-    "CabinesDisponiveis": 21
+    "CabinesDisponiveis": 22
   },
   {
     "Id": 16,
@@ -320,7 +320,7 @@
     ],
     "NumeroNoites": 10,
     "ValorPorPessoa": 2500,
-    "CabinesDisponiveis": 26
+    "CabinesDisponiveis": 30
   },
   {
     "Id": 18,
@@ -339,7 +339,7 @@
     ],
     "NumeroNoites": 7,
     "ValorPorPessoa": 2700,
-    "CabinesDisponiveis": 51
+    "CabinesDisponiveis": 52
   },
   {
     "Id": 19,
@@ -358,7 +358,7 @@
     ],
     "NumeroNoites": 12,
     "ValorPorPessoa": 2800,
-    "CabinesDisponiveis": 13
+    "CabinesDisponiveis": 14
   },
   {
     "Id": 20,

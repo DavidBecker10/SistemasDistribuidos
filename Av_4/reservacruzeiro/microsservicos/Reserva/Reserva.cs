@@ -31,6 +31,7 @@ app.UseCors("AllowAll");
 
 // Configuração para SSE
 var sseConnections = new ConcurrentBag<HttpResponse>();
+HttpResponse? sseConnection = null;
 
 var pagamentoStatus = new ConcurrentQueue<string>();
 
@@ -69,23 +70,39 @@ bool VerifySignature(string message, string signature)
 }
 
 // SSE Endpoint
-app.MapGet("/sse", async (HttpContext context) =>
+app.MapGet("/sse", async (
+    HttpContext context,
+    CancellationToken cancellationToken) =>
 {
     context.Response.Headers.Append("Cache-Control", "no-cache");
     context.Response.Headers.Append("Content-Type", "text/event-stream");
     context.Response.Headers.Append("Connection", "keep-alive");
 
-    sseConnections.Add(context.Response);
+    //sseConnection = context.Response;
 
-    // Mantém a conexão aberta
-    await context.Response.Body.FlushAsync();
-    await Task.Delay(-1); // Bloqueia indefinidamente até a desconexão
+    while (!cancellationToken.IsCancellationRequested)
+    {
+        var pag = new
+            {
+                paga = "aprovado/recusado",
+                Price = Random.Shared.Next(0, 1000),
+                DateTime = DateTime.Now
+            };
+
+        await context.Response.WriteAsync("event: pagamento", cancellationToken: cancellationToken);
+        await context.Response.WriteAsync("\n", cancellationToken: cancellationToken);
+        await context.Response.WriteAsync("data: ", cancellationToken: cancellationToken);
+        await JsonSerializer.SerializeAsync(context.Response.Body, pag, cancellationToken: cancellationToken);
+        await context.Response.WriteAsync("\n\n", cancellationToken: cancellationToken);
+        await context.Response.Body.FlushAsync(cancellationToken);
+    }
+    await Task.Delay(-1);
 });
 
 var options = new JsonSerializerOptions
 {
     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    WriteIndented = true // Opcional, para saída formatada
+    WriteIndented = true
 };
 
 List<dynamic> reservas = File.Exists(reservasJsonPath)
@@ -115,11 +132,9 @@ consumerPagamentoAprovado.ReceivedAsync += async (model, ea) =>
 
             var sseMessage = $"event: pagamentoAprovado\ndata: {JsonSerializer.Serialize(originalMessage, options)}\n\n";
 
-            foreach (var response in sseConnections)
-            {
-                await response.WriteAsync(sseMessage);
-                await response.Body.FlushAsync();
-            }
+            //Console.WriteLine($"Enviando evento SSE");
+            //await sseConnection.WriteAsync(sseMessage);
+            //await sseConnection.Body.FlushAsync();
         }
         else
         {
@@ -164,11 +179,9 @@ consumerPagamentoRecusado.ReceivedAsync += async (model, ea) =>
 
                 var sseMessage = $"event: pagamentoRecusado\ndata: {JsonSerializer.Serialize(originalMessage, options)}\n\n";
 
-                foreach (var response in sseConnections)
-                {
-                    await response.WriteAsync(sseMessage);
-                    await response.Body.FlushAsync();
-                }
+                //Console.WriteLine($"Enviando evento SSE");
+                //await sseConnection.WriteAsync(sseMessage);
+                //await sseConnection.Body.FlushAsync();
 
                 var id = idElement.GetString();
                 if (string.IsNullOrEmpty(id))

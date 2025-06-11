@@ -21,9 +21,11 @@
     useEffect(() => {
         const eventSource = new EventSource('http://localhost:5000/sse');
 
+        eventSource.onopen = () => console.log(">>> Connection opened!");
+
         eventSource.onmessage = (event) => {
             const parsedData = JSON.parse(event.data);
-            console.error('dado evento:', event.data);
+            console.log("dado evento:", event.data);
             setEvents((prev) => [...prev, parsedData]);
         };
 
