@@ -23,11 +23,11 @@
 
         eventSource.onopen = () => console.log(">>> Connection opened!");
 
-        eventSource.onmessage = (event) => {
+        eventSource.addEventListener('pagamento', (event) => {
+            console.log("Evento 'pagamento' recebido:", event.data);
             const parsedData = JSON.parse(event.data);
-            console.log("dado evento:", event.data);
             setEvents((prev) => [...prev, parsedData]);
-        };
+        }); 
 
         eventSource.onerror = (err) => {
             console.error('Erro no SSE:', err);

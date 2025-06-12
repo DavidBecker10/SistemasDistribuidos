@@ -82,21 +82,17 @@ app.MapGet("/sse", async (
 
     while (!cancellationToken.IsCancellationRequested)
     {
-        var pag = new
-            {
-                paga = "aprovado/recusado",
-                Price = Random.Shared.Next(0, 1000),
-                DateTime = DateTime.Now
-            };
+        Console.WriteLine("ENDPOINT SSE");
 
-        await context.Response.WriteAsync("event: pagamento", cancellationToken: cancellationToken);
-        await context.Response.WriteAsync("\n", cancellationToken: cancellationToken);
-        await context.Response.WriteAsync("data: ", cancellationToken: cancellationToken);
-        await JsonSerializer.SerializeAsync(context.Response.Body, pag, cancellationToken: cancellationToken);
-        await context.Response.WriteAsync("\n\n", cancellationToken: cancellationToken);
+        var payload = JsonSerializer.Serialize(new { type = "pagamento", data = "aprovado/recusado" });
+        await context.Response.WriteAsync("event: pagamento\n", cancellationToken);
+        await context.Response.WriteAsync($"data: {payload}\n\n", cancellationToken);
+
         await context.Response.Body.FlushAsync(cancellationToken);
+
+        await Task.Delay(500, cancellationToken);
     }
-    await Task.Delay(-1);
+
 });
 
 var options = new JsonSerializerOptions

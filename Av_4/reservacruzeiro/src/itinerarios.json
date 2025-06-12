@@ -16,7 +16,7 @@
     ],
     "NumeroNoites": 7,
     "ValorPorPessoa": 1200,
-    "CabinesDisponiveis": 55
+    "CabinesDisponiveis": 59
   },
   {
     "Id": 2,
@@ -35,7 +35,7 @@
     ],
     "NumeroNoites": 10,
     "ValorPorPessoa": 1500,
-    "CabinesDisponiveis": 44
+    "CabinesDisponiveis": 50
   },
   {
     "Id": 3,
@@ -92,7 +92,7 @@
     ],
     "NumeroNoites": 10,
     "ValorPorPessoa": 2200,
-    "CabinesDisponiveis": 19
+    "CabinesDisponiveis": 22
   },
   {
     "Id": 6,
@@ -206,7 +206,7 @@
     ],
     "NumeroNoites": 7,
     "ValorPorPessoa": 1700,
-    "CabinesDisponiveis": 42
+    "CabinesDisponiveis": 43
   },
   {
     "Id": 12,
@@ -301,7 +301,7 @@
     ],
     "NumeroNoites": 7,
     "ValorPorPessoa": 1600,
-    "CabinesDisponiveis": 41
+    "CabinesDisponiveis": 42
   },
   {
     "Id": 17,
@@ -320,7 +320,7 @@
     ],
     "NumeroNoites": 10,
     "ValorPorPessoa": 2500,
-    "CabinesDisponiveis": 30
+    "CabinesDisponiveis": 33
   },
   {
     "Id": 18,
@@ -339,7 +339,7 @@
     ],
     "NumeroNoites": 7,
     "ValorPorPessoa": 2700,
-    "CabinesDisponiveis": 52
+    "CabinesDisponiveis": 53
   },
   {
     "Id": 19,
@@ -358,7 +358,7 @@
     ],
     "NumeroNoites": 12,
     "ValorPorPessoa": 2800,
-    "CabinesDisponiveis": 14
+    "CabinesDisponiveis": 17
   },
   {
     "Id": 20,
@@ -377,6 +377,6 @@
     ],
     "NumeroNoites": 9,
     "ValorPorPessoa": 2600,
-    "CabinesDisponiveis": 36
+    "CabinesDisponiveis": 39
   }
 ]

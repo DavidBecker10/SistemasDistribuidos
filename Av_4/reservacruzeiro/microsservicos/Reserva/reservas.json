@@ -1,82 +1,10 @@
 [
   {
-    "Id": "e4d3beb4-811b-41d7-9cd0-46c9be73d2f3",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "San Juan",
-    "DataEmbarque": "01/11/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 16
-  },
-  {
-    "Id": "f8d57506-970d-450d-aec9-329936734adc",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Sao Petersburgo",
-    "DataEmbarque": "15/05/2025",
-    "NumeroCabines": 3,
-    "ItinerarioId": 20
-  },
-  {
-    "Id": "412cedc4-9c57-4f34-b4bc-99547e119ced",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Anchorage",
-    "DataEmbarque": "05/04/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 19
-  },
-  {
-    "Id": "c7eaf1bb-11b8-46fc-819f-7b0cfc65a81a",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Kyoto",
-    "DataEmbarque": "01/03/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 18
-  },
-  {
-    "Id": "4fc210e6-868a-4b1c-910b-da05614c4b42",
-    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
-    "Destino": "Hong Kong",
-    "DataEmbarque": "29/03/2025",
-    "NumeroCabines": 3,
-    "ItinerarioId": 9
-  },
-  {
-    "Id": "ae4f29f2-eec9-46ab-a422-61e3d7f04c98",
-    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
-    "Destino": "Havaa",
-    "DataEmbarque": "15/07/2025",
-    "NumeroCabines": 3,
-    "ItinerarioId": 3
-  },
-  {
-    "Id": "60bc288c-fd0b-45a2-9509-a314d0f829bc",
-    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
-    "Destino": "Havaa",
-    "DataEmbarque": "15/07/2025",
-    "NumeroCabines": 3,
-    "ItinerarioId": 3
-  },
-  {
-    "Id": "78cc5b7e-e1c8-418a-ad0b-3c175b87c176",
-    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
-    "Destino": "Reykjavik",
-    "DataEmbarque": "01/08/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 5
-  },
-  {
     "Id": "f614e1bb-38ea-4bc9-a524-27c79503a469",
     "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
     "Destino": "Ilhas Svalbard",
     "DataEmbarque": "15/07/2025",
     "NumeroCabines": 1,
     "ItinerarioId": 13
-  },
-  {
-    "Id": "9d03aef1-b23a-4bb2-ad6a-616346758a0f",
-    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
-    "Destino": "Bahamas",
-    "DataEmbarque": "01/05/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 1
   }
 ]
