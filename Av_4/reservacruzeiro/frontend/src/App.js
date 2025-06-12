@@ -17,17 +17,39 @@
     const [selecoes, setSelecoes] = useState({});
     const [reservas, setReservas] = useState([]);
     const [statusPagamentos, setStatusPagamentos] = useState([]);
+    const [currentUserId, setCurrentUserId] = useState(null);
 
     useEffect(() => {
         const eventSource = new EventSource('http://localhost:5000/sse');
 
         eventSource.onopen = () => console.log(">>> Connection opened!");
 
-        eventSource.addEventListener('pagamento', (event) => {
-            console.log("Evento 'pagamento' recebido:", event.data);
-            const parsedData = JSON.parse(event.data);
-            setEvents((prev) => [...prev, parsedData]);
-        }); 
+        eventSource.addEventListener('pagamentoAprovado', (event) => {
+            try {
+              const parsedData = JSON.parse(event.data);
+              console.log("🔔 Evento Aprovado recebido:", parsedData);
+
+              if (!currentUserId) {
+                setCurrentUserId(parsedData.UserId);
+              }
+
+              if (parsedData.UserId === currentUserId) {
+                setEvents((prev) => [...prev, parsedData]);
+              }
+            } catch (err) {
+              console.error("Erro ao parsear event.data:", event.data, err);
+            }
+        });
+
+        eventSource.addEventListener('pagamentoRecusado', (event) => {
+            try {
+              const parsedData = JSON.parse(event.data);
+              console.log("🔔 Evento Recusado recebido:", parsedData);
+              setEvents((prev) => [...prev, parsedData]);
+            } catch (err) {
+              console.error("Erro ao parsear event.data:", event.data, err);
+            }
+        });
 
         eventSource.onerror = (err) => {
             console.error('Erro no SSE:', err);
@@ -281,11 +303,11 @@
         <div>
             <h1>Eventos Recebidos</h1>
             <ul>
-                {events.map((event, index) => (
-                    <li key={index}>
-                        Tipo: {event.type}, Dados: {JSON.stringify(event.data)}
-                    </li>
-                ))}
+              {events.map((event, index) => (
+                <li key={index}>
+                  Destino: {event.Destino}, Data de Embarque: {event.DataEmbarque}, Cabines: {event.NumeroCabines}
+                </li>
+              ))}
             </ul>
         </div>
       </div>

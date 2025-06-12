@@ -31,7 +31,6 @@ app.UseCors("AllowAll");
 
 // Configuração para SSE
 var sseConnections = new ConcurrentBag<HttpResponse>();
-HttpResponse? sseConnection = null;
 
 var pagamentoStatus = new ConcurrentQueue<string>();
 
@@ -78,9 +77,22 @@ app.MapGet("/sse", async (
     context.Response.Headers.Append("Content-Type", "text/event-stream");
     context.Response.Headers.Append("Connection", "keep-alive");
 
-    //sseConnection = context.Response;
+    sseConnections.Add(context.Response);
 
-    while (!cancellationToken.IsCancellationRequested)
+    try
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await Task.Delay(10_000, cancellationToken); // ping ocasional para manter a conexão viva
+        }
+    }
+    catch (OperationCanceledException) { /* conexão encerrada */ }
+    finally
+    {
+        sseConnections.TryTake(out _);
+    }
+
+    /*while (!cancellationToken.IsCancellationRequested)
     {
         Console.WriteLine("ENDPOINT SSE");
 
@@ -91,7 +103,7 @@ app.MapGet("/sse", async (
         await context.Response.Body.FlushAsync(cancellationToken);
 
         await Task.Delay(500, cancellationToken);
-    }
+    }*/
 
 });
 
@@ -126,11 +138,20 @@ consumerPagamentoAprovado.ReceivedAsync += async (model, ea) =>
             var paymentInfo = JsonSerializer.Deserialize<JsonElement>(signedMessage.Message);
             var originalMessage = JsonSerializer.Deserialize<JsonElement>(paymentInfo.GetProperty("OriginalMessage").GetString());
 
-            var sseMessage = $"event: pagamentoAprovado\ndata: {JsonSerializer.Serialize(originalMessage, options)}\n\n";
+            var sseMessage = $"event: pagamentoAprovado\ndata: {JsonSerializer.Serialize(originalMessage)}\n\n";
 
-            //Console.WriteLine($"Enviando evento SSE");
-            //await sseConnection.WriteAsync(sseMessage);
-            //await sseConnection.Body.FlushAsync();
+            foreach (var connection in sseConnections)
+            {
+                try
+                {
+                    await connection.WriteAsync(sseMessage);
+                    await connection.Body.FlushAsync();
+                }
+                catch
+                {
+                    Console.WriteLine("Falha ao enviar SSE — conexão pode ter sido encerrada.");
+                }
+            }
         }
         else
         {
@@ -173,11 +194,21 @@ consumerPagamentoRecusado.ReceivedAsync += async (model, ea) =>
                     return;
                 }
 
-                var sseMessage = $"event: pagamentoRecusado\ndata: {JsonSerializer.Serialize(originalMessage, options)}\n\n";
+                var sseMessage = $"event: pagamentoRecusado\ndata: {JsonSerializer.Serialize(originalMessage)}\n\n";
 
-                //Console.WriteLine($"Enviando evento SSE");
-                //await sseConnection.WriteAsync(sseMessage);
-                //await sseConnection.Body.FlushAsync();
+                foreach (var connection in sseConnections)
+                {
+                    try
+                    {
+                        await connection.WriteAsync(sseMessage);
+                        await connection.Body.FlushAsync();
+                    }
+                    catch
+                    {
+                        // Não tem como remover diretamente da ConcurrentBag — aceitamos "naturalmente" que está obsoleta
+                        Console.WriteLine("Falha ao enviar SSE — conexão pode ter sido encerrada.");
+                    }
+                }
 
                 var id = idElement.GetString();
                 if (string.IsNullOrEmpty(id))
