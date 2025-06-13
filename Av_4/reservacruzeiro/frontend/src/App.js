@@ -17,10 +17,10 @@
     const [selecoes, setSelecoes] = useState({});
     const [reservas, setReservas] = useState([]);
     const [statusPagamentos, setStatusPagamentos] = useState([]);
-    const [currentUserId, setCurrentUserId] = useState(null);
 
     useEffect(() => {
-        const eventSource = new EventSource('http://localhost:5000/sse');
+        console.log(userId);
+        const eventSource = new EventSource(`http://localhost:5000/sse?userId=${userId}`);
 
         eventSource.onopen = () => console.log(">>> Connection opened!");
 
@@ -28,14 +28,19 @@
             try {
               const parsedData = JSON.parse(event.data);
               console.log("🔔 Evento Aprovado recebido:", parsedData);
+              
+              setEvents((prev) => [
+                ...prev,
+                {
+                  Id: parsedData.Id,
+                  UserId: parsedData.UserId,
+                  ItinerarioId: parsedData.ItinerarioId,  
+                  Destino: parsedData.Destino,
+                  DataEmbarque: parsedData.DataEmbarque,
+                  NumeroCabines: parsedData.NumeroCabines,
+                }
+              ]);
 
-              if (!currentUserId) {
-                setCurrentUserId(parsedData.UserId);
-              }
-
-              if (parsedData.UserId === currentUserId) {
-                setEvents((prev) => [...prev, parsedData]);
-              }
             } catch (err) {
               console.error("Erro ao parsear event.data:", event.data, err);
             }
@@ -45,7 +50,19 @@
             try {
               const parsedData = JSON.parse(event.data);
               console.log("🔔 Evento Recusado recebido:", parsedData);
-              setEvents((prev) => [...prev, parsedData]);
+
+              setEvents((prev) => [
+                ...prev,
+                {
+                  Id: parsedData.Id,
+                  UserId: parsedData.UserId,
+                  ItinerarioId: parsedData.ItinerarioId,  
+                  Destino: parsedData.Destino,
+                  DataEmbarque: parsedData.DataEmbarque,
+                  NumeroCabines: parsedData.NumeroCabines,
+                }
+              ]);
+
             } catch (err) {
               console.error("Erro ao parsear event.data:", event.data, err);
             }

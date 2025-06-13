@@ -1,13 +1,5 @@
 [
   {
-    "Id": "f614e1bb-38ea-4bc9-a524-27c79503a469",
-    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
-    "Destino": "Ilhas Svalbard",
-    "DataEmbarque": "15/07/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 13
-  },
-  {
     "Id": "510e9512-442b-44ad-8b64-36754a4b1c6a",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
     "Destino": "Anchorage",
@@ -86,5 +78,133 @@
     "DataEmbarque": "15/07/2025",
     "NumeroCabines": 3,
     "ItinerarioId": 13
+  },
+  {
+    "Id": "fe787705-588a-4c53-ae2e-a316387c2c79",
+    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
+    "Destino": "Hong Kong",
+    "DataEmbarque": "01/03/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 9
+  },
+  {
+    "Id": "30a39a00-fc33-4d50-9a24-90a489cde29f",
+    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
+    "Destino": "Durban",
+    "DataEmbarque": "01/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 11
+  },
+  {
+    "Id": "37a86e38-8f3a-49db-9d53-48d79f29d996",
+    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
+    "Destino": "Hong Kong",
+    "DataEmbarque": "01/03/2025",
+    "NumeroCabines": 2,
+    "ItinerarioId": 9
+  },
+  {
+    "Id": "bb6edbe1-6123-40d2-98d3-3d160eef5ae2",
+    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
+    "Destino": "Havaa",
+    "DataEmbarque": "15/07/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 3
+  },
+  {
+    "Id": "8c5651c1-0dbb-477c-9e15-c79e0289a523",
+    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
+    "Destino": "Bahamas",
+    "DataEmbarque": "01/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 1
+  },
+  {
+    "Id": "62ae64b6-61c5-4ce8-b7db-45a4c0576bdf",
+    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
+    "Destino": "Aruba",
+    "DataEmbarque": "10/06/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 2
+  },
+  {
+    "Id": "5481969a-65f5-4df9-b520-ddc22b6a4910",
+    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
+    "Destino": "Antartica",
+    "DataEmbarque": "05/09/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 6
+  },
+  {
+    "Id": "486106f5-bd6d-4af9-ba3a-105c3c4d3e20",
+    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
+    "Destino": "Havaa",
+    "DataEmbarque": "15/07/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 3
+  },
+  {
+    "Id": "bc95346e-985d-42d7-9def-e33aaac337cf",
+    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
+    "Destino": "Atenas",
+    "DataEmbarque": "05/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 4
+  },
+  {
+    "Id": "1c772f4a-39f6-43a9-8fa9-9f66ee6e996b",
+    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
+    "Destino": "Belem",
+    "DataEmbarque": "01/11/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 7
+  },
+  {
+    "Id": "0c285c9a-2e06-45b1-8b31-aea0f5cb52cf",
+    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
+    "Destino": "Havaa",
+    "DataEmbarque": "15/07/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 3
+  },
+  {
+    "Id": "5cd0b431-b9ba-4261-b407-05c66b3a2b1f",
+    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
+    "Destino": "Anchorage",
+    "DataEmbarque": "05/04/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 19
+  },
+  {
+    "Id": "75537921-5f45-46cd-9511-bf26ab605ad6",
+    "UserId": "3a0ef10b-d6c2-40c4-b39d-d4913aff2628",
+    "Destino": "Maldivas",
+    "DataEmbarque": "05/04/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 10
+  },
+  {
+    "Id": "3784825a-5cea-4eea-899b-1a5b7787df34",
+    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
+    "Destino": "Kyoto",
+    "DataEmbarque": "15/03/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 18
+  },
+  {
+    "Id": "d7763aac-db65-4950-9ce9-88e9dace9293",
+    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
+    "Destino": "Anchorage",
+    "DataEmbarque": "19/04/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 19
+  },
+  {
+    "Id": "aeef6956-fad7-47c0-bebb-ce0a84531e3f",
+    "UserId": "b9bc5d39-9d8c-4113-abdd-eb19b8284418",
+    "Destino": "Anchorage",
+    "DataEmbarque": "19/04/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 19
   }
 ]

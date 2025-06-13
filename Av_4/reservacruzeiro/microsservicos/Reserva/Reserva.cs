@@ -30,7 +30,7 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 // Configuração para SSE
-var sseConnections = new ConcurrentBag<HttpResponse>();
+var sseConnections = new ConcurrentDictionary<string, HttpResponse>();
 
 var pagamentoStatus = new ConcurrentQueue<string>();
 
@@ -73,23 +73,41 @@ app.MapGet("/sse", async (
     HttpContext context,
     CancellationToken cancellationToken) =>
 {
+    var userId = context.Request.Query["userId"].ToString();
+
+
+    if (string.IsNullOrEmpty(userId))
+    {
+        context.Response.StatusCode = 400;
+        await context.Response.WriteAsync("Parâmetro 'userId' é obrigatório.");
+        return;
+    }
+
     context.Response.Headers.Append("Cache-Control", "no-cache");
     context.Response.Headers.Append("Content-Type", "text/event-stream");
     context.Response.Headers.Append("Connection", "keep-alive");
 
-    sseConnections.Add(context.Response);
+
+    // Adiciona ou substitui a conexão existente para o userId
+    sseConnections[userId] = context.Response;
+
+    Console.WriteLine($"[SSE] Conexão iniciada para userId: {userId}");
 
     try
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            // Comentário SSE para manter a conexão viva
+            await context.Response.WriteAsync(":\n\n");
+            await context.Response.Body.FlushAsync();
             await Task.Delay(10_000, cancellationToken); // ping ocasional para manter a conexão viva
         }
     }
     catch (OperationCanceledException) { /* conexão encerrada */ }
     finally
     {
-        sseConnections.TryTake(out _);
+        sseConnections.TryRemove(userId, out _);
+        Console.WriteLine($"[SSE] Conexão encerrada para userId: {userId}");
     }
 
     /*while (!cancellationToken.IsCancellationRequested)
@@ -138,20 +156,31 @@ consumerPagamentoAprovado.ReceivedAsync += async (model, ea) =>
             var paymentInfo = JsonSerializer.Deserialize<JsonElement>(signedMessage.Message);
             var originalMessage = JsonSerializer.Deserialize<JsonElement>(paymentInfo.GetProperty("OriginalMessage").GetString());
 
+            if (!originalMessage.TryGetProperty("UserId", out var userIdElement))
+            {
+                Console.WriteLine("[Reserva] Campo 'UserId' não encontrado.");
+                return;
+            }
+
+            var userId = userIdElement.GetString();
+            if (string.IsNullOrEmpty(userId)) return;
+
             var sseMessage = $"event: pagamentoAprovado\ndata: {JsonSerializer.Serialize(originalMessage)}\n\n";
 
-            foreach (var connection in sseConnections)
+            if (sseConnections.TryGetValue(userId, out var response))
             {
                 try
                 {
-                    await connection.WriteAsync(sseMessage);
-                    await connection.Body.FlushAsync();
+                    await response.WriteAsync(sseMessage);
+                    await response.Body.FlushAsync();
                 }
                 catch
                 {
-                    Console.WriteLine("Falha ao enviar SSE — conexão pode ter sido encerrada.");
+                    Console.WriteLine($"[Reserva] Falha ao enviar SSE para {userId}.");
+                    sseConnections.TryRemove(userId, out _);
                 }
             }
+
         }
         else
         {
@@ -188,33 +217,32 @@ consumerPagamentoRecusado.ReceivedAsync += async (model, ea) =>
             {
                 var originalMessage = JsonSerializer.Deserialize<JsonElement>(paymentInfo.GetProperty("OriginalMessage").GetString());
 
-                if (!originalMessage.TryGetProperty("Id", out JsonElement idElement))
+                if (!originalMessage.TryGetProperty("Id", out var idElement) ||
+                    !originalMessage.TryGetProperty("UserId", out var userIdElement))
                 {
-                    Console.WriteLine($"[Reserva] Erro ao cancelar reserva com pagamento recusado: Campo 'Id' não encontrado.");
+                    Console.WriteLine("[Reserva] Campos obrigatórios não encontrados.");
                     return;
-                }
-
-                var sseMessage = $"event: pagamentoRecusado\ndata: {JsonSerializer.Serialize(originalMessage)}\n\n";
-
-                foreach (var connection in sseConnections)
-                {
-                    try
-                    {
-                        await connection.WriteAsync(sseMessage);
-                        await connection.Body.FlushAsync();
-                    }
-                    catch
-                    {
-                        // Não tem como remover diretamente da ConcurrentBag — aceitamos "naturalmente" que está obsoleta
-                        Console.WriteLine("Falha ao enviar SSE — conexão pode ter sido encerrada.");
-                    }
                 }
 
                 var id = idElement.GetString();
-                if (string.IsNullOrEmpty(id))
+                var userId = userIdElement.GetString();
+                if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(userId)) return;
+
+                var sseMessage = $"event: pagamentoRecusado\ndata: {JsonSerializer.Serialize(originalMessage)}\n\n";
+
+
+                if (sseConnections.TryGetValue(userId, out var response))
                 {
-                    Console.WriteLine("Id inválido no cancelamento de pagamento recusado.");
-                    return;
+                    try
+                    {
+                        await response.WriteAsync(sseMessage);
+                        await response.Body.FlushAsync();
+                    }
+                    catch
+                    {
+                        Console.WriteLine($"[Reserva] Falha ao enviar SSE para {userId}.");
+                        sseConnections.TryRemove(userId, out _);
+                    }
                 }
 
                 Console.WriteLine($"Cancelamento recebido: {id}");
