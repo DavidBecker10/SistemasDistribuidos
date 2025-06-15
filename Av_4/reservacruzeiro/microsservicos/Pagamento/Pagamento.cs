@@ -18,8 +18,8 @@ var options = new JsonSerializerOptions
 
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
 
-// fila reserva-criada
-await channel.QueueDeclareAsync(queue: "reserva-criada", durable: true, exclusive: false, autoDelete: false, arguments: null);
+// exchange reserva-criada
+await channel.ExchangeDeclareAsync(exchange: "reserva-criada", type: ExchangeType.Fanout);
 
 var privateKeyDir = "keys/private";
 var publicKeyDir = "keys/public";
@@ -96,7 +96,9 @@ consumer.ReceivedAsync += async (model, ea) =>
 };
 
 // consumo da fila "reserva-criada"
-await channel.BasicConsumeAsync(queue: "reserva-criada", autoAck: true, consumer: consumer);
+await channel.QueueDeclareAsync(queue: "reserva-criada-pagamento", durable: true, exclusive: false, autoDelete: false);
+await channel.QueueBindAsync(queue: "reserva-criada-pagamento", exchange: "reserva-criada", routingKey: string.Empty);
+await channel.BasicConsumeAsync(queue: "reserva-criada-pagamento", autoAck: true, consumer: consumer);
 
 Console.WriteLine(" [*] Waiting for messages in 'reserva-criada'.");
 Console.WriteLine(" Press [enter] to exit.");

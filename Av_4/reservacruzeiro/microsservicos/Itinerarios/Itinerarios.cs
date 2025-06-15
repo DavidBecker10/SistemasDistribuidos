@@ -40,7 +40,7 @@ using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
 // Declaração das filas
-await channel.QueueDeclareAsync(queue: "reserva-criada", durable: true, exclusive: false, autoDelete: false, arguments: null);
+await channel.ExchangeDeclareAsync(exchange: "reserva-criada", type: ExchangeType.Fanout);
 await channel.QueueDeclareAsync(queue: "reserva-cancelada", durable: true, exclusive: false, autoDelete: false, arguments: null);
 
 // Consumidor para a fila "reserva-criada"
@@ -98,8 +98,11 @@ consumerReservaCancelada.ReceivedAsync += async (model, ea) =>
     await Task.CompletedTask;
 };
 
-// Consumir filas
-await channel.BasicConsumeAsync(queue: "reserva-criada", autoAck: true, consumer: consumerReservaCriada);
+// consumo da fila "reserva-criada"
+await channel.QueueDeclareAsync(queue: "reserva-criada-itinerarios", durable: true, exclusive: false, autoDelete: false);
+await channel.QueueBindAsync(queue: "reserva-criada-itinerarios", exchange: "reserva-criada", routingKey: string.Empty);
+await channel.BasicConsumeAsync(queue: "reserva-criada-itinerarios", autoAck: true, consumer: consumerReservaCriada);
+
 await channel.BasicConsumeAsync(queue: "reserva-cancelada", autoAck: true, consumer: consumerReservaCancelada);
 
 // Endpoint para obter itinerários

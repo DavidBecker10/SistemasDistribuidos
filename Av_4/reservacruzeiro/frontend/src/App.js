@@ -16,7 +16,6 @@
     const [resultados, setResultados] = useState([]);
     const [selecoes, setSelecoes] = useState({});
     const [reservas, setReservas] = useState([]);
-    const [statusPagamentos, setStatusPagamentos] = useState([]);
 
     useEffect(() => {
         console.log(userId);
@@ -32,6 +31,7 @@
               setEvents((prev) => [
                 ...prev,
                 {
+                  StatusPagamento: "Pagamento Aprovado",
                   Id: parsedData.Id,
                   UserId: parsedData.UserId,
                   ItinerarioId: parsedData.ItinerarioId,  
@@ -40,6 +40,8 @@
                   NumeroCabines: parsedData.NumeroCabines,
                 }
               ]);
+              handleSearch();
+              fetchReservas();
 
             } catch (err) {
               console.error("Erro ao parsear event.data:", event.data, err);
@@ -54,6 +56,7 @@
               setEvents((prev) => [
                 ...prev,
                 {
+                  StatusPagamento: "Pagamento Recusado",
                   Id: parsedData.Id,
                   UserId: parsedData.UserId,
                   ItinerarioId: parsedData.ItinerarioId,  
@@ -62,6 +65,8 @@
                   NumeroCabines: parsedData.NumeroCabines,
                 }
               ]);
+              handleSearch();
+              fetchReservas();
 
             } catch (err) {
               console.error("Erro ao parsear event.data:", event.data, err);
@@ -146,6 +151,7 @@
 
         if (response.ok) {
           alert('Reserva criada com sucesso!');
+          handleSearch();
           fetchReservas();
         } else {
           alert('Erro ao criar reserva.');
@@ -166,6 +172,7 @@
 
         if (response.ok) {
           alert('Reserva cancelada com sucesso!');
+          handleSearch();
           fetchReservas();
         } else {
           alert(response.status);
@@ -179,23 +186,6 @@
 
     useEffect(() => {
       fetchReservas();
-    }, []);
-
-    // Requisicao para buscar o status do pagamento
-    const fetchStatusPagamentos = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/pagamento/status');
-        const status = await response.json();
-        setStatusPagamentos(status);
-      } catch (error) {
-        console.error('Erro ao buscar status de pagamentos:', error);
-      }
-    };
-
-    // Atualizar status pagamento a cada 10 segundos
-    useEffect(() => {
-      const interval = setInterval(fetchStatusPagamentos, 10000);
-      return () => clearInterval(interval);
     }, []);
 
     return (
@@ -242,6 +232,7 @@
                   <th>Noites</th>
                   <th>Preço (por pessoa)</th>
                   <th>Ações</th>
+                  <th>Cabines Disponíveis</th>
                 </tr>
               </thead>
               <tbody>
@@ -280,25 +271,13 @@
                         <button onClick={() => handleSelect(itinerario)}>Reservar</button>
                       </div>
                     </td>
+                    <td>{itinerario.CabinesDisponiveis}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
             <p>Nenhum itinerário encontrado.</p>
-          )}
-        </div>
-
-        <div className="paymentStatus">
-          <h2>Status dos Pagamentos</h2>
-          {statusPagamentos.length > 0 ? (
-            <ul className='eachStatus'>
-              {statusPagamentos.map((status, index) => (
-                <li key={index}>{status}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>Nenhum status de pagamento disponível.</p>
           )}
         </div>
 
@@ -317,15 +296,22 @@
             <p>Você não possui reservas.</p>
           )}
         </div>
-        <div>
-            <h1>Eventos Recebidos</h1>
-            <ul>
+        <div className="eventos">
+          <h1>Eventos Recebidos</h1>
+          <ul>
               {events.map((event, index) => (
-                <li key={index}>
-                  Destino: {event.Destino}, Data de Embarque: {event.DataEmbarque}, Cabines: {event.NumeroCabines}
-                </li>
+                  <li key={index}>
+                      <span 
+                          style={{
+                              color: event.StatusPagamento === "Pagamento Aprovado" ? "green" : "red"
+                          }}
+                      >
+                          [{event.StatusPagamento}]
+                      </span> 
+                       Destino: {event.Destino}, Data de Embarque: {event.DataEmbarque}, Cabines: {event.NumeroCabines}
+                  </li>
               ))}
-            </ul>
+          </ul>
         </div>
       </div>
     );

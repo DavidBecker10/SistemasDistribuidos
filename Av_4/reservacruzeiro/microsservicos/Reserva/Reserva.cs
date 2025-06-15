@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 
 var publicKeyPath = "keys/public/public.key"; // Caminho da chave pública do Pagamento
 var itinerariosServiceUrl = "http://localhost:5001/api/itinerarios"; // URL do microsserviço de Itinerários
+var sistemaPagamentoUrl = "http://localhost:5002/api/pagamentos"; // URL do microsserviço de Pagamentos
 var reservasJsonPath = "reservas.json"; // Arquivo para armazenar as reservas
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +41,8 @@ using var channel = await connection.CreateChannelAsync();
 
 // exchange "direct_pagamento"
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
+
+await channel.ExchangeDeclareAsync(exchange: "reserva-criada", type: ExchangeType.Fanout);
 await channel.QueueDeclareAsync(queue: "reserva-cancelada", durable: true, exclusive: false, autoDelete: false);
 
 // chave publica do Pagamento
@@ -87,7 +90,6 @@ app.MapGet("/sse", async (
     context.Response.Headers.Append("Content-Type", "text/event-stream");
     context.Response.Headers.Append("Connection", "keep-alive");
 
-
     // Adiciona ou substitui a conexão existente para o userId
     sseConnections[userId] = context.Response;
 
@@ -109,19 +111,6 @@ app.MapGet("/sse", async (
         sseConnections.TryRemove(userId, out _);
         Console.WriteLine($"[SSE] Conexão encerrada para userId: {userId}");
     }
-
-    /*while (!cancellationToken.IsCancellationRequested)
-    {
-        Console.WriteLine("ENDPOINT SSE");
-
-        var payload = JsonSerializer.Serialize(new { type = "pagamento", data = "aprovado/recusado" });
-        await context.Response.WriteAsync("event: pagamento\n", cancellationToken);
-        await context.Response.WriteAsync($"data: {payload}\n\n", cancellationToken);
-
-        await context.Response.Body.FlushAsync(cancellationToken);
-
-        await Task.Delay(500, cancellationToken);
-    }*/
 
 });
 
@@ -310,6 +299,33 @@ app.MapGet("/api/pagamento/status", async (HttpContext context) =>
     await context.Response.WriteAsync(JsonSerializer.Serialize(mensagens, options));
 });
 
+// Endpoint para obter link de pagamentos
+app.MapGet("/api/pagamentos", async (HttpContext context) =>
+{
+    try
+    {
+        using var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync(sistemaPagamentoUrl);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var pagamentos = await response.Content.ReadAsStringAsync();
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(pagamentos);
+        }
+        else
+        {
+            context.Response.StatusCode = (int)response.StatusCode;
+            await context.Response.WriteAsync("Erro ao obter link de Pagamento.");
+        }
+    }
+    catch (Exception ex)
+    {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync($"Erro ao conectar ao Sistema de Pagamentos: {ex.Message}");
+    }
+});
+
 // Endpoint para obter itinerários via microsserviço de Itinerários
 app.MapGet("/api/itinerarios", async (HttpContext context) =>
 {
@@ -354,9 +370,9 @@ app.MapPost("/api/reserva/criar", async (HttpContext context) =>
         SaveReservas();
         Console.WriteLine($"[Reserva Criada] Dados recebidos: {body}");
 
-        // Publicar mensagem na fila "reserva-criada"
+        // mensagem para exchange "reserva-criada"
         var bodyBytes = Encoding.UTF8.GetBytes(body);
-        await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "reserva-criada", body: bodyBytes);
+        await channel.BasicPublishAsync(exchange: "reserva-criada", routingKey: string.Empty, body: bodyBytes);
 
         context.Response.StatusCode = 201;
         await context.Response.WriteAsync("Reserva criada e publicada com sucesso!");
