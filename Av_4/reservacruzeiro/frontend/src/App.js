@@ -32,6 +32,7 @@
               setEvents((prev) => [
                 ...prev,
                 {
+                  Tipo: "Pagamento",
                   StatusPagamento: "Pagamento Aprovado",
                   Id: parsedData.Id,
                   UserId: parsedData.UserId,
@@ -57,6 +58,7 @@
               setEvents((prev) => [
                 ...prev,
                 {
+                  Tipo: "Pagamento",
                   StatusPagamento: "Pagamento Recusado",
                   Id: parsedData.Id,
                   UserId: parsedData.UserId,
@@ -90,6 +92,25 @@
 
             } catch (err) {
                 console.error("Erro ao parsear evento de promoção:", event.data, err);
+            }
+        });
+
+                eventSource.addEventListener('bilheteGerado', (event) => {
+            try {
+                const parsedData = JSON.parse(event.data);
+                console.log("🔔 Bilhete Gerado recebido:", parsedData);
+
+                // Atualizar o estado ou notificar o usuário sobre o bilhete gerado
+                setEvents((prev) => [
+                    ...prev,
+                    {
+                        Tipo: "bilheteGerado",
+                        Mensagem: `Bilhete gerado para o itinerário ${parsedData.OriginalMessage.ItinerarioId}.`,
+                    }
+                ]);
+
+            } catch (err) {
+                console.error("Erro ao parsear evento de bilhete gerado:", event.data, err);
             }
         });
 
@@ -367,7 +388,11 @@
                             <>
                                 <span style={{ color: "blue" }}>[Promoção]</span> {event.Mensagem}
                             </>
-                        ) : (
+                        ) : event.Tipo === "bilheteGerado" ? (
+                            <>
+                                <span style={{ color: "orange" }}>[Bilhete Gerado]</span> {event.Mensagem}
+                            </>
+                        ) : event.StatusPagamento ? (
                             <>
                                 <span
                                     style={{
@@ -375,9 +400,13 @@
                                     }}
                                 >
                                     [{event.StatusPagamento}]
-                                </span>{" "}
-                                Destino: {event.Destino}, Data de Embarque: {event.DataEmbarque}, Cabines: {event.NumeroCabines}
+                                </span>
+                                {event.Destino && ` Destino: ${event.Destino}`}
+                                {event.DataEmbarque && `, Data de Embarque: ${event.DataEmbarque}`}
+                                {event.NumeroCabines && `, Cabines: ${event.NumeroCabines}`}
                             </>
+                        ) : (
+                            console.log("Evento desconhecido:", event)
                         )}
                     </li>
                 ))}

@@ -10,11 +10,11 @@ await channel.ExchangeDeclareAsync(exchange: "promocoes", type: ExchangeType.Fan
 
 Random random = new Random();
 
-var message = $"DESCONTO DE {random.Next(10, 51)}% NO ITINERÁRIO DE ID {random.Next(1, 20)}!";
-var body = Encoding.UTF8.GetBytes(message);
-
 while (true)
 {
+    var message = $"DESCONTO DE {random.Next(10, 51)}% NO ITINERÁRIO DE ID {random.Next(1, 20)}!";
+    var body = Encoding.UTF8.GetBytes(message);
+
     await channel.BasicPublishAsync(exchange: "promocoes", routingKey: string.Empty, body: body);
     Console.WriteLine($" [x] Sent: '{message}'");
 

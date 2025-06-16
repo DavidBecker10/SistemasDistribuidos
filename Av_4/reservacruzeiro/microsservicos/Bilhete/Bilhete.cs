@@ -9,13 +9,14 @@ using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
-
 // fila para bilhete
 var queueName = "bilhete-pagamento-aprovado";
 await channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false);
 
 // assicia a fila e a exchange com a routing key "pagamento.aprovado"
 await channel.QueueBindAsync(queue: queueName, exchange: "direct_pagamento", routingKey: "pagamento.aprovado");
+
+await channel.QueueDeclareAsync(queue: "bilhete-gerado", durable: true, exclusive: false, autoDelete: false);
 
 // chave publica do microsservico de Pagamento
 var publicKeyPath = "keys/public/public.key";
@@ -54,23 +55,18 @@ consumer.ReceivedAsync += async (model, ea) =>
         byte[] body = ea.Body.ToArray();
         var rawMessage = Encoding.UTF8.GetString(body);
 
-        var signedMessage = JsonSerializer.Deserialize<SignedMessage>(rawMessage);
+        var rawJson = JsonSerializer.Deserialize<string>(rawMessage);
 
-        if (signedMessage != null && VerifySignature(signedMessage.Message, signedMessage.Signature))
-        {
-            Console.WriteLine($"[Bilhete] Mensagem válida recebida: {signedMessage.Message}");
+        var paymentInfo = JsonSerializer.Deserialize<JsonElement>(rawJson);
 
-            // Publicar mensagem na fila "bilhete-gerado"
-            var responseMessage = new { OriginalMessage = signedMessage.Message, bilhete = "gerado" };
-            var responseBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(responseMessage));
-            await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "bilhete-gerado", body: responseBody);
+        Console.WriteLine($"[Bilhete] Mensagem válida recebida: {paymentInfo}");
 
-            Console.WriteLine($"[Bilhete] Published to 'bilhete-gerado': {JsonSerializer.Serialize(responseMessage)}");
-        }
-        else
-        {
-            Console.WriteLine("[Bilhete] Assinatura inválida. Mensagem descartada.");
-        }
+        // Publicar mensagem na fila "bilhete-gerado"
+        var responseMessage = new { OriginalMessage = paymentInfo, bilhete = "gerado" };
+        var responseBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(responseMessage));
+        await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "bilhete-gerado", body: responseBody);
+
+        Console.WriteLine($"[Bilhete] Published to 'bilhete-gerado': {JsonSerializer.Serialize(responseMessage)}");
     }
     catch (Exception ex)
     {

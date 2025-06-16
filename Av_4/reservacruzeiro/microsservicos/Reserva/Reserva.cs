@@ -46,6 +46,8 @@ await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct")
 
 await channel.ExchangeDeclareAsync(exchange: "promocoes", type: ExchangeType.Fanout);
 
+await channel.QueueDeclareAsync(queue: "bilhete-gerado", durable: true, exclusive: false, autoDelete: false);
+
 await channel.ExchangeDeclareAsync(exchange: "reserva-criada", type: ExchangeType.Fanout);
 await channel.QueueDeclareAsync(queue: "reserva-cancelada", durable: true, exclusive: false, autoDelete: false);
 
@@ -511,6 +513,53 @@ consumerPromocoes.ReceivedAsync += async (model, ea) =>
 await channel.QueueDeclareAsync(queue: "promocoes", durable: true, exclusive: false, autoDelete: false);
 await channel.QueueBindAsync(queue: "promocoes", exchange: "promocoes", routingKey: string.Empty);
 await channel.BasicConsumeAsync(queue: "promocoes", autoAck: true, consumer: consumerPromocoes);
+
+// Consumidor para a fila "bilhete-gerado"
+var consumerBilhete = new AsyncEventingBasicConsumer(channel);
+consumerBilhete.ReceivedAsync += async (model, ea) =>
+{
+    byte[] body = ea.Body.ToArray();
+    var rawMessage = Encoding.UTF8.GetString(body);
+
+    try
+    {
+        // Log da mensagem recebida
+        Console.WriteLine($"[Reserva] Bilhete gerado recebido: {rawMessage}");
+
+        // Parse da mensagem recebida
+        var responseMessage = JsonSerializer.Deserialize<JsonElement>(rawMessage);
+
+        // Criar a mensagem SSE
+        var sseMessage = $"event: bilheteGerado\ndata: {JsonSerializer.Serialize(responseMessage)}\n\n";
+
+        // Notificar usuários interessados
+        foreach (var (userId, response) in sseConnections)
+        {
+            try
+            {
+                // Enviar a mensagem via SSE
+                await response.WriteAsync(sseMessage);
+                await response.Body.FlushAsync();
+                Console.WriteLine($"[Reserva] Notificação de bilhete gerado enviada para {userId}.");
+            }
+            catch
+            {
+                // Remover conexão quebrada
+                Console.WriteLine($"[Reserva] Falha ao enviar bilhete gerado para {userId}. Conexão removida.");
+                sseConnections.TryRemove(userId, out _);
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Reserva] Erro ao processar bilhete gerado: {ex.Message}");
+    }
+
+    await Task.CompletedTask;
+};
+await channel.BasicConsumeAsync(queue: "bilhete-gerado", autoAck: true, consumer: consumerBilhete);
+
+Console.WriteLine(" [*] Waiting for messages from 'bilhete-gerado'.");
 
 Console.WriteLine(" [*] RabbitMQ consumer running...");
 Console.WriteLine(" [*] Waiting for messages. Access '/api/itinerarios' for itineraries.");

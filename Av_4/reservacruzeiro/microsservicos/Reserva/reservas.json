@@ -152,71 +152,7 @@
     "ItinerarioId": 19
   },
   {
-    "Id": "fbf717b9-31eb-4125-b83c-672b38947f12",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Anchorage",
-    "DataEmbarque": "05/04/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 19
-  },
-  {
-    "Id": "9911f9ae-6ac6-43be-96b3-13a9cd4c8e78",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Sao Petersburgo",
-    "DataEmbarque": "01/05/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 20
-  },
-  {
-    "Id": "7bead16b-b784-4160-8a88-206df5876484",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Sao Petersburgo",
-    "DataEmbarque": "01/05/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 20
-  },
-  {
-    "Id": "b461475c-8ce8-485c-bbf3-2c77e421d117",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Kyoto",
-    "DataEmbarque": "01/03/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 18
-  },
-  {
-    "Id": "42d75203-c9ae-47e7-bbc3-e3d3a2302aa2",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Sao Petersburgo",
-    "DataEmbarque": "01/05/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 20
-  },
-  {
-    "Id": "94ccd51c-3cb8-4783-b3c7-c8715e25043b",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Sao Petersburgo",
-    "DataEmbarque": "01/05/2025",
-    "NumeroCabines": 2,
-    "ItinerarioId": 20
-  },
-  {
-    "Id": "6d013b60-6048-4104-ad6f-f6134b4af1e8",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Sao Petersburgo",
-    "DataEmbarque": "01/05/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 20
-  },
-  {
-    "Id": "56a3973f-d474-4f73-b37d-211235871c8d",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Anchorage",
-    "DataEmbarque": "05/04/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 19
-  },
-  {
-    "Id": "97eb2fd3-0f2b-46d8-a418-94169d8e56c4",
+    "Id": "84d52fcd-43c3-4f00-912d-0eb7888f55f6",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
     "Destino": "Panama",
     "DataEmbarque": "01/08/2025",
@@ -224,11 +160,43 @@
     "ItinerarioId": 14
   },
   {
-    "Id": "1405d89d-1c95-4a28-9b80-973084329304",
+    "Id": "48d29d08-d711-488c-aa49-11abad673379",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "15/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 20
+  },
+  {
+    "Id": "0590d91a-e4e7-441c-95c6-d1f0a29bbdea",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Anchorage",
+    "DataEmbarque": "19/04/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 19
+  },
+  {
+    "Id": "2e2d201f-a2f8-41d6-8bab-26f95b0da8d0",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
     "Destino": "Sao Petersburgo",
     "DataEmbarque": "01/05/2025",
     "NumeroCabines": 1,
+    "ItinerarioId": 20
+  },
+  {
+    "Id": "92a5937c-1fbb-4c81-8231-5d738e851c45",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Kyoto",
+    "DataEmbarque": "15/03/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 18
+  },
+  {
+    "Id": "26c9cd6f-ef24-4fa5-b50f-4d1fba8d744c",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "15/05/2025",
+    "NumeroCabines": 10,
     "ItinerarioId": 20
   }
 ]
