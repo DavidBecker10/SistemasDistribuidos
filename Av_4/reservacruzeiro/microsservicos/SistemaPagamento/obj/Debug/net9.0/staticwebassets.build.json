@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "hcevs9ZrxTZCT2wIA89q/Fi5MP0PZabmscYBZpJp2i8=",
+  "Source": "SistemaPagamento",
+  "BasePath": "_content/SistemaPagamento",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

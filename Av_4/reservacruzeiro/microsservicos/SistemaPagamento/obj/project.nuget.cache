@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "YQqRz7bGMVU=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\SistemaPagamento\\SistemaPagamento.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\david\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.4\\microsoft.aspnetcore.openapi.9.0.4.nupkg.sha512",
+    "C:\\Users\\david\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}

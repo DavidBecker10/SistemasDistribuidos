@@ -1,0 +1,6 @@
+@SistemaPagamento_HostAddress = http://localhost:5293
+
+GET {{SistemaPagamento_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

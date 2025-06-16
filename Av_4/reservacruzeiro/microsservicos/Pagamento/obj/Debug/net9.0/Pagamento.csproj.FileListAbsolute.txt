@@ -23,7 +23,6 @@ C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruz
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\bin\Debug\net9.0\Pagamento.dll
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\bin\Debug\net9.0\Pagamento.pdb
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\bin\Debug\net9.0\RabbitMQ.Client.dll
-C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\bin\Debug\net9.0\System.Threading.RateLimiting.dll
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\Pagamento.csproj.AssemblyReference.cache
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\Pagamento.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\Pagamento.AssemblyInfoInputs.cache
@@ -36,3 +35,5 @@ C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruz
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\Pagamento.pdb
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\Pagamento.genruntimeconfig.cache
 C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\obj\Debug\net9.0\ref\Pagamento.dll
+C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\bin\Debug\net9.0\Microsoft.AspNetCore.Server.Kestrel.Https.dll
+C:\Users\david\OneDrive\Documentos\David\9_Periodo\Distribuidos\Av_4\reservacruzeiro\microsservicos\Pagamento\bin\Debug\net9.0\Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.dll

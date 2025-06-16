@@ -6,33 +6,19 @@ var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-await channel.ExchangeDeclareAsync(exchange: "direct_logs", type: ExchangeType.Direct);
+await channel.ExchangeDeclareAsync(exchange: "promocoes", type: ExchangeType.Fanout);
 
 Random random = new Random();
 
-string local = "";
-
-var message = "PROMOCAO";
+var message = $"DESCONTO DE {random.Next(10, 51)}% NO ITINERÁRIO DE ID {random.Next(1, 20)}!";
 var body = Encoding.UTF8.GetBytes(message);
 
-int i = 0;
-while (i < 10)
+while (true)
 {
-    // Randomiza o local de promocao a cada 5 segundos
-    int randPromo = random.Next(1, 4);
-
-    if (randPromo == 1)
-        local = "curitiba";
-    else if (randPromo == 2)
-        local = "saopaulo";
-    else
-        local = "rio";
-
-    await channel.BasicPublishAsync(exchange: "direct_logs", routingKey: local, body: body);
-    Console.WriteLine($" [x] Sent '{local}' : '{message}'");
+    await channel.BasicPublishAsync(exchange: "promocoes", routingKey: string.Empty, body: body);
+    Console.WriteLine($" [x] Sent: '{message}'");
 
     Thread.Sleep(5000);
-    i++;
 }
 
 Console.WriteLine(" Press [enter] to exit.");

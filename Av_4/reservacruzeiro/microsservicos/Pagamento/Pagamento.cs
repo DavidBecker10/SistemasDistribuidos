@@ -5,16 +5,29 @@ using System.Text;
 using System.Text.Json;
 using System.IO;
 using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
+
+var builder = WebApplication.CreateBuilder(args);
 
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
+
+var externalPaymentUrl = "http://localhost:5002/api/pagamentos"; // URL do sistema externo de pagamentos
+
+var app = builder.Build();
 
 var options = new JsonSerializerOptions
 {
     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     WriteIndented = true // Opcional, para saída formatada
 };
+
+// Dicionário para armazenar as informações de pagamentos com status
+var paymentStatusCache = new ConcurrentDictionary<string, string>();
 
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
 
@@ -63,31 +76,41 @@ consumer.ReceivedAsync += async (model, ea) =>
         var message = Encoding.UTF8.GetString(body);
         Console.WriteLine($" [x] Received: {message}");
 
-        await Task.Delay(5000);
+        var httpClient = new HttpClient();
 
-        var random = new Random();
-        bool pagamentoAprovado = random.Next(0, 2) == 0;
+        var content = new StringContent(message, Encoding.UTF8, "application/json");
 
-        // routingKey baseada no status do pagamento
-        string routingKey = pagamentoAprovado ? "pagamento.aprovado" : "pagamento.recusado";
+        Console.WriteLine($" [x] Sending payment data to external system: {externalPaymentUrl}");
+        var response = await httpClient.PostAsync(externalPaymentUrl, content);
 
-        var responseMessage = new { OriginalMessage = message, Status = pagamentoAprovado ? "Aprovado" : "Recusado" };
-        var messageBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(responseMessage, options));
-
-        // assinar a mensagem
-        var signature = rsa.SignData(messageBody, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-        var signedMessage = new
+        if (!response.IsSuccessStatusCode)
         {
-            Message = JsonSerializer.Serialize(responseMessage, options),
-            Signature = Convert.ToBase64String(signature)
-        };
+            Console.WriteLine($" [!] Error: Unable to process payment. Status code: {response.StatusCode}");
+            return;
+        }
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($" [x] Response from external system: {responseBody}");
+
+        // Parse da resposta
+        var jsonDocument = JsonDocument.Parse(responseBody);
+        var rootElement = jsonDocument.RootElement;
+
+        // Acessa o campo "status" no JSON
+        string status = rootElement.GetProperty("status").GetString() ?? "Indefinido";
+        string transactionId = rootElement.GetProperty("transactionId").GetString() ?? "Desconhecido";
+
+        // Atualizar o cache com o status do pagamento
+        paymentStatusCache[transactionId] = status;
+
+        // Publicar na fila apropriada
+        string routingKey = status == "Aprovado" ? "pagamento.aprovado" : "pagamento.recusado";
 
         // publica mensagem assinada na exchange
-        var responseBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(signedMessage, options));
-        await channel.BasicPublishAsync(exchange: "direct_pagamento", routingKey: routingKey, body: responseBody);
+        var messageResponseBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(responseBody, options));
+        await channel.BasicPublishAsync(exchange: "direct_pagamento", routingKey: routingKey, body: messageResponseBody);
 
-        Console.WriteLine($" [x] Published to '{routingKey}': {JsonSerializer.Serialize(signedMessage, options)}");
+        Console.WriteLine($" [x] Published to '{routingKey}': {JsonSerializer.Serialize(responseBody, options)}");
     }
     catch (Exception ex)
     {
@@ -99,6 +122,20 @@ consumer.ReceivedAsync += async (model, ea) =>
 await channel.QueueDeclareAsync(queue: "reserva-criada-pagamento", durable: true, exclusive: false, autoDelete: false);
 await channel.QueueBindAsync(queue: "reserva-criada-pagamento", exchange: "reserva-criada", routingKey: string.Empty);
 await channel.BasicConsumeAsync(queue: "reserva-criada-pagamento", autoAck: true, consumer: consumer);
+
+app.MapGet("/api/pagamento/status/{transactionId}", async (HttpContext context, string transactionId) =>
+{
+    if (paymentStatusCache.TryGetValue(transactionId, out var paymentInfo))
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(paymentInfo);
+    }
+    else
+    {
+        context.Response.StatusCode = 404;
+        await context.Response.WriteAsync($"Pagamento com ID {transactionId} não encontrado.");
+    }
+});
 
 Console.WriteLine(" [*] Waiting for messages in 'reserva-criada'.");
 Console.WriteLine(" Press [enter] to exit.");

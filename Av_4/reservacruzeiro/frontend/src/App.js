@@ -16,6 +16,7 @@
     const [resultados, setResultados] = useState([]);
     const [selecoes, setSelecoes] = useState({});
     const [reservas, setReservas] = useState([]);
+    const [interessePromocoes, setInteressePromocoes] = useState(false);
 
     useEffect(() => {
         console.log(userId);
@@ -70,6 +71,25 @@
 
             } catch (err) {
               console.error("Erro ao parsear event.data:", event.data, err);
+            }
+        });
+
+        eventSource.addEventListener('promocao', (event) => {
+            try {
+                const parsedData = JSON.parse(event.data);
+                console.log("🔔 Promoção recebida:", parsedData);
+
+                // Atualizar o estado ou notificar o usuário sobre a promoção
+                setEvents((prev) => [
+                    ...prev,
+                    {
+                        Tipo: "Promoção",
+                        Mensagem: parsedData, // Promoção completa como string
+                    }
+                ]);
+
+            } catch (err) {
+                console.error("Erro ao parsear evento de promoção:", event.data, err);
             }
         });
 
@@ -188,6 +208,37 @@
       fetchReservas();
     }, []);
 
+    const atualizarInteressePromocoes = async (interesse) => {
+      try {
+        const response = await fetch('http://localhost:5000/api/promocoes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            UserId: userId,
+            Interested: interesse,
+          }),
+        });
+
+        if (!response.ok) {
+          alert('Erro ao atualizar preferência de promoções.');
+        } else {
+          alert('Preferência atualizada com sucesso!');
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar preferência de promoções:', error);
+        alert('Erro ao comunicar com o servidor. Tente novamente mais tarde.');
+      }
+    };
+
+    const handlePromocoesChange = (event) => {
+      const novoValor = event.target.checked;
+      setInteressePromocoes(novoValor);
+      atualizarInteressePromocoes(novoValor);
+    };
+
+
     return (
       <div className="container">
         <h1 className="title">Reserva de Cruzeiros</h1>
@@ -217,6 +268,17 @@
           <button className="buttonSearch" onClick={handleSearch}>
             <FiSearch size={25} color="#FFF" />
           </button>
+        </div>
+
+        <div className="promocoes">
+          <label>
+            <input
+              type="checkbox"
+              checked={interessePromocoes}
+              onChange={handlePromocoesChange}
+            />
+            Quero receber promoções
+          </label>
         </div>
 
         <div className="results">
@@ -297,21 +359,29 @@
           )}
         </div>
         <div className="eventos">
-          <h1>Eventos Recebidos</h1>
-          <ul>
-              {events.map((event, index) => (
-                  <li key={index}>
-                      <span 
-                          style={{
-                              color: event.StatusPagamento === "Pagamento Aprovado" ? "green" : "red"
-                          }}
-                      >
-                          [{event.StatusPagamento}]
-                      </span> 
-                       Destino: {event.Destino}, Data de Embarque: {event.DataEmbarque}, Cabines: {event.NumeroCabines}
-                  </li>
-              ))}
-          </ul>
+            <h1>Eventos Recebidos</h1>
+            <ul>
+                {events.map((event, index) => (
+                    <li key={index}>
+                        {event.Tipo === "Promoção" ? (
+                            <>
+                                <span style={{ color: "blue" }}>[Promoção]</span> {event.Mensagem}
+                            </>
+                        ) : (
+                            <>
+                                <span
+                                    style={{
+                                        color: event.StatusPagamento === "Pagamento Aprovado" ? "green" : "red",
+                                    }}
+                                >
+                                    [{event.StatusPagamento}]
+                                </span>{" "}
+                                Destino: {event.Destino}, Data de Embarque: {event.DataEmbarque}, Cabines: {event.NumeroCabines}
+                            </>
+                        )}
+                    </li>
+                ))}
+            </ul>
         </div>
       </div>
     );

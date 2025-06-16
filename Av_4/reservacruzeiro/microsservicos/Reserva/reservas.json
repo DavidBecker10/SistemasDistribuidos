@@ -152,14 +152,6 @@
     "ItinerarioId": 19
   },
   {
-    "Id": "b09056b3-9d11-4847-89a6-53d6533ceae1",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Egito",
-    "DataEmbarque": "05/09/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 15
-  },
-  {
     "Id": "fbf717b9-31eb-4125-b83c-672b38947f12",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
     "Destino": "Anchorage",
@@ -176,7 +168,7 @@
     "ItinerarioId": 20
   },
   {
-    "Id": "c3a61876-6f0d-4e2c-878a-72e6f35ebfdc",
+    "Id": "7bead16b-b784-4160-8a88-206df5876484",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
     "Destino": "Sao Petersburgo",
     "DataEmbarque": "01/05/2025",
@@ -184,51 +176,59 @@
     "ItinerarioId": 20
   },
   {
-    "Id": "8d93ed5e-ba41-48a8-a5f4-38c36b625c0f",
+    "Id": "b461475c-8ce8-485c-bbf3-2c77e421d117",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Bahamas",
-    "DataEmbarque": "01/05/2025",
-    "NumeroCabines": 2,
-    "ItinerarioId": 1
+    "Destino": "Kyoto",
+    "DataEmbarque": "01/03/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 18
   },
   {
-    "Id": "61787bf6-2f94-46f8-bc84-750d8738ad5b",
+    "Id": "42d75203-c9ae-47e7-bbc3-e3d3a2302aa2",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "01/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 20
+  },
+  {
+    "Id": "94ccd51c-3cb8-4783-b3c7-c8715e25043b",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "01/05/2025",
+    "NumeroCabines": 2,
+    "ItinerarioId": 20
+  },
+  {
+    "Id": "6d013b60-6048-4104-ad6f-f6134b4af1e8",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "01/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 20
+  },
+  {
+    "Id": "56a3973f-d474-4f73-b37d-211235871c8d",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
     "Destino": "Anchorage",
     "DataEmbarque": "05/04/2025",
-    "NumeroCabines": 2,
+    "NumeroCabines": 1,
     "ItinerarioId": 19
   },
   {
-    "Id": "93103758-4008-497e-9c25-ed5894e2e126",
+    "Id": "97eb2fd3-0f2b-46d8-a418-94169d8e56c4",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Panama",
+    "DataEmbarque": "01/08/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 14
+  },
+  {
+    "Id": "1405d89d-1c95-4a28-9b80-973084329304",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
     "Destino": "Sao Petersburgo",
-    "DataEmbarque": "29/05/2025",
+    "DataEmbarque": "01/05/2025",
     "NumeroCabines": 1,
     "ItinerarioId": 20
-  },
-  {
-    "Id": "7abe6ff5-a042-4b86-a7b1-b795ab23a12b",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Ilhas Svalbard",
-    "DataEmbarque": "15/07/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 13
-  },
-  {
-    "Id": "6c645798-e6cd-440f-b640-c74f9d51d9e0",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Sydney",
-    "DataEmbarque": "10/12/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 17
-  },
-  {
-    "Id": "067f4c77-c260-42e1-ba73-15f0d34192ee",
-    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Kyoto",
-    "DataEmbarque": "15/03/2025",
-    "NumeroCabines": 1,
-    "ItinerarioId": 18
   }
 ]

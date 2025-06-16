@@ -14,6 +14,8 @@ var itinerariosServiceUrl = "http://localhost:5001/api/itinerarios"; // URL do m
 var sistemaPagamentoUrl = "http://localhost:5002/api/pagamentos"; // URL do microsserviço de Pagamentos
 var reservasJsonPath = "reservas.json"; // Arquivo para armazenar as reservas
 
+var promocoes = new ConcurrentDictionary<string, bool>(); // Variável para armazenar interesse em promoções
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -41,6 +43,8 @@ using var channel = await connection.CreateChannelAsync();
 
 // exchange "direct_pagamento"
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
+
+await channel.ExchangeDeclareAsync(exchange: "promocoes", type: ExchangeType.Fanout);
 
 await channel.ExchangeDeclareAsync(exchange: "reserva-criada", type: ExchangeType.Fanout);
 await channel.QueueDeclareAsync(queue: "reserva-cancelada", durable: true, exclusive: false, autoDelete: false);
@@ -135,45 +139,36 @@ consumerPagamentoAprovado.ReceivedAsync += async (model, ea) =>
 
     try
     {
-        var signedMessage = JsonSerializer.Deserialize<SignedMessage>(rawMessage);
+        var rawJson = JsonSerializer.Deserialize<string>(rawMessage);
 
-        if (signedMessage != null && VerifySignature(signedMessage.Message, signedMessage.Signature))
+        var paymentInfo = JsonSerializer.Deserialize<JsonElement>(rawJson);
+
+        pagamentoStatus.Enqueue($"[Aprovado] {rawJson}");
+        Console.WriteLine($"[Reserva] Pagamento Aprovado (mensagem assinada): {rawJson}");
+
+        if (!paymentInfo.TryGetProperty("UserId", out var userIdElement))
         {
-            pagamentoStatus.Enqueue($"[Aprovado] {signedMessage.Message}");
-            Console.WriteLine($"[Reserva] Pagamento Aprovado (mensagem assinada): {signedMessage.Message}");
-
-            var paymentInfo = JsonSerializer.Deserialize<JsonElement>(signedMessage.Message);
-            var originalMessage = JsonSerializer.Deserialize<JsonElement>(paymentInfo.GetProperty("OriginalMessage").GetString());
-
-            if (!originalMessage.TryGetProperty("UserId", out var userIdElement))
-            {
-                Console.WriteLine("[Reserva] Campo 'UserId' não encontrado.");
-                return;
-            }
-
-            var userId = userIdElement.GetString();
-            if (string.IsNullOrEmpty(userId)) return;
-
-            var sseMessage = $"event: pagamentoAprovado\ndata: {JsonSerializer.Serialize(originalMessage)}\n\n";
-
-            if (sseConnections.TryGetValue(userId, out var response))
-            {
-                try
-                {
-                    await response.WriteAsync(sseMessage);
-                    await response.Body.FlushAsync();
-                }
-                catch
-                {
-                    Console.WriteLine($"[Reserva] Falha ao enviar SSE para {userId}.");
-                    sseConnections.TryRemove(userId, out _);
-                }
-            }
-
+            Console.WriteLine("[Reserva] Campo 'UserId' não encontrado.");
+            return;
         }
-        else
+
+        var userId = userIdElement.GetString();
+        if (string.IsNullOrEmpty(userId)) return;
+
+        var sseMessage = $"event: pagamentoAprovado\ndata: {JsonSerializer.Serialize(paymentInfo)}\n\n";
+
+        if (sseConnections.TryGetValue(userId, out var response))
         {
-            Console.WriteLine("[Reserva] Assinatura inválida para mensagem de pagamento aprovado.");
+            try
+            {
+                await response.WriteAsync(sseMessage);
+                await response.Body.FlushAsync();
+            }
+            catch
+            {
+                Console.WriteLine($"[Reserva] Falha ao enviar SSE para {userId}.");
+                sseConnections.TryRemove(userId, out _);
+            }
         }
     }
     catch (Exception ex)
@@ -193,80 +188,70 @@ consumerPagamentoRecusado.ReceivedAsync += async (model, ea) =>
 
     try
     {
-        var signedMessage = JsonSerializer.Deserialize<SignedMessage>(rawMessage);
+        var rawJson = JsonSerializer.Deserialize<string>(rawMessage);
 
-        if (signedMessage != null && VerifySignature(signedMessage.Message, signedMessage.Signature))
+        var paymentInfo = JsonSerializer.Deserialize<JsonElement>(rawJson);
+
+        pagamentoStatus.Enqueue($"[Recusado] {rawJson}");
+        Console.WriteLine($"[Reserva] Pagamento Recusado (mensagem assinada): {rawJson}");
+
+        if (paymentInfo.GetProperty("status").GetString() == "Recusado")
         {
-            pagamentoStatus.Enqueue($"[Recusado] {signedMessage.Message}");
-            Console.WriteLine($"[Reserva] Pagamento Recusado (mensagem assinada): {signedMessage.Message}");
-
-            var paymentInfo = JsonSerializer.Deserialize<JsonElement>(signedMessage.Message);
-
-            if (paymentInfo.GetProperty("Status").GetString() == "Recusado")
+            if (!paymentInfo.TryGetProperty("Id", out var idElement) ||
+                !paymentInfo.TryGetProperty("UserId", out var userIdElement))
             {
-                var originalMessage = JsonSerializer.Deserialize<JsonElement>(paymentInfo.GetProperty("OriginalMessage").GetString());
-
-                if (!originalMessage.TryGetProperty("Id", out var idElement) ||
-                    !originalMessage.TryGetProperty("UserId", out var userIdElement))
-                {
-                    Console.WriteLine("[Reserva] Campos obrigatórios não encontrados.");
-                    return;
-                }
-
-                var id = idElement.GetString();
-                var userId = userIdElement.GetString();
-                if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(userId)) return;
-
-                var sseMessage = $"event: pagamentoRecusado\ndata: {JsonSerializer.Serialize(originalMessage)}\n\n";
-
-
-                if (sseConnections.TryGetValue(userId, out var response))
-                {
-                    try
-                    {
-                        await response.WriteAsync(sseMessage);
-                        await response.Body.FlushAsync();
-                    }
-                    catch
-                    {
-                        Console.WriteLine($"[Reserva] Falha ao enviar SSE para {userId}.");
-                        sseConnections.TryRemove(userId, out _);
-                    }
-                }
-
-                Console.WriteLine($"Cancelamento recebido: {id}");
-
-                // Localizar a reserva
-                var reservaElement = reservas.FirstOrDefault(r => r.GetProperty("Id").GetString() == id);
-                if (reservaElement.ValueKind == JsonValueKind.Undefined)
-                {
-                    Console.WriteLine("Reserva não encontrada.");
-                    return;
-                }
-
-                // Obter dados da reserva
-                var reservaCanc = new Reserva
-                {
-                    ItinerarioId = reservaElement.GetProperty("ItinerarioId").GetInt32(),
-                    NumeroCabines = reservaElement.GetProperty("NumeroCabines").GetInt32()
-                };
-
-                // Remover a reserva da lista e salvar no arquivo
-                reservas.RemoveAll(r => r.GetProperty("Id").GetString() == id);
-                SaveReservas();
-
-                // Serializar e publicar na fila de cancelamento
-                var cancelBody = JsonSerializer.Serialize(reservaCanc, options);
-                var bodyBytes = Encoding.UTF8.GetBytes(cancelBody);
-
-                await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "reserva-cancelada", body: bodyBytes);
-
-                Console.WriteLine($"Reserva cancelada publicada: {cancelBody}");
+                Console.WriteLine("[Reserva] Campos obrigatórios não encontrados.");
+                return;
             }
-        }
-        else
-        {
-            Console.WriteLine("[Reserva] Assinatura inválida para mensagem de pagamento recusado.");
+
+            var id = idElement.GetString();
+            var userId = userIdElement.GetString();
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(userId)) return;
+
+            var sseMessage = $"event: pagamentoRecusado\ndata: {JsonSerializer.Serialize(paymentInfo)}\n\n";
+
+            if (sseConnections.TryGetValue(userId, out var response))
+            {
+                try
+                {
+                    await response.WriteAsync(sseMessage);
+                    await response.Body.FlushAsync();
+                }
+                catch
+                {
+                    Console.WriteLine($"[Reserva] Falha ao enviar SSE para {userId}.");
+                    sseConnections.TryRemove(userId, out _);
+                }
+            }
+
+            Console.WriteLine($"Cancelamento recebido: {id}");
+
+            // Localizar a reserva
+            var reservaElement = reservas.FirstOrDefault(r => r.GetProperty("Id").GetString() == id);
+            if (reservaElement.ValueKind == JsonValueKind.Undefined)
+            {
+                Console.WriteLine("Reserva não encontrada.");
+                return;
+            }
+
+            // Obter dados da reserva
+            var reservaCanc = new Reserva
+            {
+                ItinerarioId = reservaElement.GetProperty("ItinerarioId").GetInt32(),
+                NumeroCabines = reservaElement.GetProperty("NumeroCabines").GetInt32()
+            };
+
+            // Remover a reserva da lista e salvar no arquivo
+            reservas.RemoveAll(r => r.GetProperty("Id").GetString() == id);
+            SaveReservas();
+
+            // Serializar e publicar na fila de cancelamento
+            var cancelBody = JsonSerializer.Serialize(reservaCanc, options);
+            var bodyBytes = Encoding.UTF8.GetBytes(cancelBody);
+
+            await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "reserva-cancelada", body: bodyBytes);
+
+            Console.WriteLine($"Reserva cancelada publicada: {cancelBody}");
         }
     }
     catch (Exception ex)
@@ -450,6 +435,83 @@ app.MapPost("/api/reserva/cancelar", async (HttpContext context) =>
     }
 });
 
+// Endpoint para registrar interesse em promoções
+app.MapPost("/api/promocoes", async (HttpContext context) =>
+{
+    try
+    {
+        var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+
+        var interesseRequest = JsonSerializer.Deserialize<InteressePromocoesRequest>(body, options);
+        if (interesseRequest == null || string.IsNullOrEmpty(interesseRequest.UserId))
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync("Requisição inválida. O campo 'UserId' é obrigatório.");
+            return;
+        }
+
+        promocoes[interesseRequest.UserId] = interesseRequest.Interested ?? false;
+        Console.WriteLine($"Interesse registrado: {JsonSerializer.Serialize(promocoes, options)}");
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = 200;
+        await context.Response.WriteAsync(JsonSerializer.Serialize(new { message = "Interesse registrado com sucesso." }, options));
+    }
+    catch (Exception ex)
+    {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync($"Erro interno no servidor: {ex.Message}");
+    }
+});
+
+// Consumidor para a exchange "promoções"
+var consumerPromocoes = new AsyncEventingBasicConsumer(channel);
+consumerPromocoes.ReceivedAsync += async (model, ea) =>
+{
+    byte[] body = ea.Body.ToArray();
+    var rawMessage = Encoding.UTF8.GetString(body);
+
+    try
+    {
+        // Log da mensagem recebida
+        Console.WriteLine($"[Reserva] Promoção recebida: {rawMessage}");
+
+        // Criar a mensagem SSE
+        var sseMessage = $"event: promocao\ndata: {JsonSerializer.Serialize(rawMessage)}\n\n";
+
+        // Notificar usuários interessados
+        foreach (var (userId, interesse) in promocoes)
+        {
+            // Verificar se o usuário está interessado em promoções
+            if (!interesse || !sseConnections.TryGetValue(userId, out var response))
+                continue;
+
+            try
+            {
+                // Enviar a promoção via SSE
+                await response.WriteAsync(sseMessage);
+                await response.Body.FlushAsync();
+                Console.WriteLine($"[Reserva] Promoção enviada para {userId}.");
+            }
+            catch
+            {
+                // Remover conexão quebrada
+                Console.WriteLine($"[Reserva] Falha ao enviar promoção para {userId}. Conexão removida.");
+                sseConnections.TryRemove(userId, out _);
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Reserva] Erro ao processar promoção: {ex.Message}");
+    }
+
+    await Task.CompletedTask;
+};
+await channel.QueueDeclareAsync(queue: "promocoes", durable: true, exclusive: false, autoDelete: false);
+await channel.QueueBindAsync(queue: "promocoes", exchange: "promocoes", routingKey: string.Empty);
+await channel.BasicConsumeAsync(queue: "promocoes", autoAck: true, consumer: consumerPromocoes);
+
 Console.WriteLine(" [*] RabbitMQ consumer running...");
 Console.WriteLine(" [*] Waiting for messages. Access '/api/itinerarios' for itineraries.");
 Console.WriteLine(" [*] Access '/api/reserva/criar' to create a reservation.");
@@ -466,4 +528,11 @@ public class Reserva
 {
     public int? ItinerarioId { get; set; }
     public int? NumeroCabines { get; set; }
+}
+
+// Classe para deserializar o corpo da requisição
+public class InteressePromocoesRequest
+{
+    public string? UserId { get; set; }
+    public bool? Interested { get; set; }
 }

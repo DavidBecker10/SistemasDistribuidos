@@ -141,11 +141,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Marketing\\Marketing.csproj",
+      "projectUniqueName": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Marketing\\Marketing.csproj",
       "projectName": "Marketing",
-      "projectPath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Marketing\\Marketing.csproj",
+      "projectPath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Marketing\\Marketing.csproj",
       "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_2\\reservacruzeiro\\microsservicos\\Marketing\\obj\\",
+      "outputPath": "C:\\Users\\david\\OneDrive\\Documentos\\David\\9_Periodo\\Distribuidos\\Av_4\\reservacruzeiro\\microsservicos\\Marketing\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config"
