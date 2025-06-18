@@ -11,7 +11,6 @@ using System.Text.Encodings.Web;
 
 var publicKeyPath = "keys/public/public.key"; // Caminho da chave pública do Pagamento
 var itinerariosServiceUrl = "http://localhost:5001/api/itinerarios"; // URL do microsserviço de Itinerários
-var sistemaPagamentoUrl = "http://localhost:5002/api/pagamentos"; // URL do microsserviço de Pagamentos
 var reservasJsonPath = "reservas.json"; // Arquivo para armazenar as reservas
 
 var promocoes = new ConcurrentDictionary<string, bool>(); // Variável para armazenar interesse em promoções
