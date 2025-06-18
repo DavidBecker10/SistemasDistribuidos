@@ -192,11 +192,11 @@
     "ItinerarioId": 18
   },
   {
-    "Id": "26c9cd6f-ef24-4fa5-b50f-4d1fba8d744c",
+    "Id": "d7b27793-4df2-4f76-89ab-0beb0e66b1ae",
     "UserId": "e518b8f4-582d-458d-8520-86950d525249",
-    "Destino": "Sao Petersburgo",
-    "DataEmbarque": "15/05/2025",
-    "NumeroCabines": 10,
-    "ItinerarioId": 20
+    "Destino": "Kyoto",
+    "DataEmbarque": "01/03/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 18
   }
 ]

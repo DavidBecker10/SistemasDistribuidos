@@ -286,33 +286,6 @@ app.MapGet("/api/pagamento/status", async (HttpContext context) =>
     await context.Response.WriteAsync(JsonSerializer.Serialize(mensagens, options));
 });
 
-// Endpoint para obter link de pagamentos
-app.MapGet("/api/pagamentos", async (HttpContext context) =>
-{
-    try
-    {
-        using var httpClient = new HttpClient();
-        var response = await httpClient.GetAsync(sistemaPagamentoUrl);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var pagamentos = await response.Content.ReadAsStringAsync();
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(pagamentos);
-        }
-        else
-        {
-            context.Response.StatusCode = (int)response.StatusCode;
-            await context.Response.WriteAsync("Erro ao obter link de Pagamento.");
-        }
-    }
-    catch (Exception ex)
-    {
-        context.Response.StatusCode = 500;
-        await context.Response.WriteAsync($"Erro ao conectar ao Sistema de Pagamentos: {ex.Message}");
-    }
-});
-
 // Endpoint para obter itinerários via microsserviço de Itinerários
 app.MapGet("/api/itinerarios", async (HttpContext context) =>
 {

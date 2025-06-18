@@ -123,20 +123,6 @@ await channel.QueueDeclareAsync(queue: "reserva-criada-pagamento", durable: true
 await channel.QueueBindAsync(queue: "reserva-criada-pagamento", exchange: "reserva-criada", routingKey: string.Empty);
 await channel.BasicConsumeAsync(queue: "reserva-criada-pagamento", autoAck: true, consumer: consumer);
 
-app.MapGet("/api/pagamento/status/{transactionId}", async (HttpContext context, string transactionId) =>
-{
-    if (paymentStatusCache.TryGetValue(transactionId, out var paymentInfo))
-    {
-        context.Response.ContentType = "application/json";
-        await context.Response.WriteAsync(paymentInfo);
-    }
-    else
-    {
-        context.Response.StatusCode = 404;
-        await context.Response.WriteAsync($"Pagamento com ID {transactionId} não encontrado.");
-    }
-});
-
 Console.WriteLine(" [*] Waiting for messages in 'reserva-criada'.");
 Console.WriteLine(" Press [enter] to exit.");
 Console.ReadLine();
