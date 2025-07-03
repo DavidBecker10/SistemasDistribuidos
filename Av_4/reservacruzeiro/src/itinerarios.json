@@ -282,7 +282,7 @@
     ],
     "NumeroNoites": 8,
     "ValorPorPessoa": 2000,
-    "CabinesDisponiveis": 34
+    "CabinesDisponiveis": 33
   },
   {
     "Id": 16,
@@ -377,6 +377,6 @@
     ],
     "NumeroNoites": 9,
     "ValorPorPessoa": 2600,
-    "CabinesDisponiveis": 43
+    "CabinesDisponiveis": 40
   }
 ]

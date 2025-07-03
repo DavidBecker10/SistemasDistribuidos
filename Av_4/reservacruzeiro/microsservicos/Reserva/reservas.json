@@ -198,5 +198,37 @@
     "DataEmbarque": "01/03/2025",
     "NumeroCabines": 1,
     "ItinerarioId": 18
+  },
+  {
+    "Id": "d643d36c-138a-44ac-a9d0-13e09b97c990",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "15/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 20
+  },
+  {
+    "Id": "f0739d6a-02dd-4e9c-bf41-c43540c685cd",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "01/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 20
+  },
+  {
+    "Id": "330904fb-2104-49bb-8ef1-bf41d95f6048",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Egito",
+    "DataEmbarque": "05/09/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 15
+  },
+  {
+    "Id": "998af412-7bc1-4d33-b8ff-085ffb7a6078",
+    "UserId": "e518b8f4-582d-458d-8520-86950d525249",
+    "Destino": "Sao Petersburgo",
+    "DataEmbarque": "01/05/2025",
+    "NumeroCabines": 1,
+    "ItinerarioId": 20
   }
 ]

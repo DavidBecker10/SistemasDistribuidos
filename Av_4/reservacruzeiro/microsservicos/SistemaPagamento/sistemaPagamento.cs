@@ -13,42 +13,67 @@ var options = new JsonSerializerOptions
     WriteIndented = true
 };
 
-app.MapPost("/api/pagamentos", async (HttpContext context) =>
+app.MapGet("/pagar/{paymentId}", async (HttpContext context) =>
 {
     try
     {
-        // Lê o corpo da requisição
-        var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
-        Console.WriteLine($" [x] Received payment data: {requestBody}");
+        var paymentId = context.Request.RouteValues["paymentId"]?.ToString();
 
-        // Delay de 5 segundos para simular processamento
-        await Task.Delay(5000);
+        if (string.IsNullOrEmpty(paymentId))
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync("ID de pagamento inválido.");
+            return;
+        }
 
-        // Randomizar o status do pagamento
+        Console.WriteLine($"[x] Processando pagamento para ID: {paymentId}");
+
+        // Simular o processamento do pagamento (aprovado ou recusado)
         var random = new Random();
         string status = random.Next(0, 2) == 0 ? "Aprovado" : "Recusado";
 
-        // Gerar um novo ID para a transação
-        string transactionId = Guid.NewGuid().ToString();
+        // Construir a resposta do pagamento
+        var response = new
+        {
+            paymentId,
+            status
+        };
 
-        // Montar a resposta com as informações recebidas e os novos dados
-        var response = JsonSerializer.Deserialize<Dictionary<string, object>>(requestBody) ?? new Dictionary<string, object>();
-        response["status"] = status;
-        response["transactionId"] = transactionId;
+        Console.WriteLine($"[x] Pagamento {status} para ID: {paymentId}");
 
-        var responseJson = JsonSerializer.Serialize(response, options);
-
-        // Enviar a resposta
+        // Enviar a resposta ao usuário
         context.Response.ContentType = "application/json";
-        await context.Response.WriteAsync(responseJson);
-
-        Console.WriteLine($" [x] Responded with: {responseJson}");
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
     }
     catch (Exception ex)
     {
         context.Response.StatusCode = 500;
         await context.Response.WriteAsync($"Erro interno do servidor: {ex.Message}");
-        Console.WriteLine($" [!] Error: {ex.Message}");
+        Console.WriteLine($"[!] Erro ao processar pagamento: {ex.Message}");
+    }
+});
+
+app.MapPost("/api/gerar-link", async (HttpContext context) =>
+{
+    try
+    {
+        var paymentId = Guid.NewGuid().ToString();
+        var paymentLink = $"http://localhost:5002/pagar/{paymentId}";
+
+        var response = new
+        {
+            paymentId,
+            paymentLink
+        };
+
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
+        Console.WriteLine($"[x] Payment link generated: {response.paymentLink}");
+    }
+    catch (Exception ex)
+    {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync($"Erro interno do servidor: {ex.Message}");
     }
 });
 

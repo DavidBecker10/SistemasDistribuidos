@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package replicacao_dados;
+
+message Data {
+  string epoch = 1;
+  int32 offset = 2;
+  string content = 3;
+}
+
+message Ack {
+  string message = 1;
+}
+
+message CommitOrder {
+  string epoch = 1;
+  int32 offset = 2;
+}
+
+message QueryRequest {
+  int32 offset = 1;
+}
+
+message QueryResponse {
+  string epoch = 1;
+  int32 offset = 2;
+  string content = 3;
+}
+
+service LeaderService {
+  rpc ReceiveData(Data) returns (Ack);
+  rpc CommitData(CommitOrder) returns (Ack);
+  rpc QueryData(QueryRequest) returns (QueryResponse);
+}
+
+service ReplicaService {
+  rpc ReceiveDataFromLeader(Data) returns (Ack);
+  rpc CommitData(CommitOrder) returns (Ack);
+}

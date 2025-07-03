@@ -142,6 +142,15 @@
       }
     };
 
+    const handlePayment = (paymentId) => {
+      fetch(`http://localhost:5003/api/pagamento/processar/${paymentId}`, { method: 'POST' })
+        .then((response) => response.json())
+        .then((data) => {
+          alert(`Pagamento ${data.status} para ID: ${data.paymentId}`);
+        })
+        .catch((error) => console.error("Erro ao processar pagamento:", error));
+    };
+
     const fetchReservas = async () => {
       try {
         const response = await fetch(`http://localhost:5000/api/reservas`);
@@ -372,6 +381,7 @@
                 <li key={reserva.Id}>
                   <span>{`Destino: ${reserva.Destino}, Data: ${reserva.DataEmbarque}, Cabines: ${reserva.NumeroCabines}`}</span>
                   <button onClick={() => handleCancel(reserva.Id)}>Cancelar</button>
+                  <button onClick={() => handlePayment(reserva.paymentId)}>Pagar</button>
                 </li>
               ))}
             </ul>

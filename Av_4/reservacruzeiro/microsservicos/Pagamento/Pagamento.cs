@@ -16,8 +16,6 @@ var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-var externalPaymentUrl = "http://localhost:5002/api/pagamentos"; // URL do sistema externo de pagamentos
-
 var app = builder.Build();
 
 var options = new JsonSerializerOptions
@@ -30,9 +28,6 @@ var options = new JsonSerializerOptions
 var paymentStatusCache = new ConcurrentDictionary<string, string>();
 
 await channel.ExchangeDeclareAsync(exchange: "direct_pagamento", type: "direct");
-
-// exchange reserva-criada
-await channel.ExchangeDeclareAsync(exchange: "reserva-criada", type: ExchangeType.Fanout);
 
 var privateKeyDir = "keys/private";
 var publicKeyDir = "keys/public";
@@ -66,63 +61,83 @@ else
     Console.WriteLine($"Chaves geradas e salvas em:\n - {privateKeyPath}\n - {publicKeyPath}");
 }
 
-// Consumidor para a fila reserva-criada
-var consumer = new AsyncEventingBasicConsumer(channel);
-consumer.ReceivedAsync += async (model, ea) =>
+app.MapPost("/api/pagamento/processar/{paymentId}", async (HttpContext context) =>
 {
     try
     {
-        byte[] body = ea.Body.ToArray();
-        var message = Encoding.UTF8.GetString(body);
-        Console.WriteLine($" [x] Received: {message}");
+        var paymentId = context.Request.RouteValues["paymentId"]?.ToString();
 
-        var httpClient = new HttpClient();
-
-        var content = new StringContent(message, Encoding.UTF8, "application/json");
-
-        Console.WriteLine($" [x] Sending payment data to external system: {externalPaymentUrl}");
-        var response = await httpClient.PostAsync(externalPaymentUrl, content);
-
-        if (!response.IsSuccessStatusCode)
+        if (string.IsNullOrEmpty(paymentId))
         {
-            Console.WriteLine($" [!] Error: Unable to process payment. Status code: {response.StatusCode}");
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync("ID de pagamento inválido.");
             return;
         }
 
-        var responseBody = await response.Content.ReadAsStringAsync();
-        Console.WriteLine($" [x] Response from external system: {responseBody}");
+        Console.WriteLine($"[Pagamento] Processando pagamento para ID: {paymentId}");
 
-        // Parse da resposta
-        var jsonDocument = JsonDocument.Parse(responseBody);
-        var rootElement = jsonDocument.RootElement;
+        var externalPaymentUrl = $"http://localhost:5002/pagar/{paymentId}";
 
-        // Acessa o campo "status" no JSON
-        string status = rootElement.GetProperty("status").GetString() ?? "Indefinido";
-        string transactionId = rootElement.GetProperty("transactionId").GetString() ?? "Desconhecido";
+        // Requisição ao sistema de pagamento externo
+        using var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync(externalPaymentUrl);
 
-        // Atualizar o cache com o status do pagamento
-        paymentStatusCache[transactionId] = status;
+        if (!response.IsSuccessStatusCode)
+        {
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync($"Erro ao acessar o sistema de pagamento externo. Código: {response.StatusCode}");
+            return;
+        }
 
-        // Publicar na fila apropriada
-        string routingKey = status == "Aprovado" ? "pagamento.aprovado" : "pagamento.recusado";
+        var paymentResponse = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"[Pagamento] Resposta do sistema de pagamento externo: {paymentResponse}");
 
-        // publica mensagem assinada na exchange
-        var messageResponseBody = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(responseBody, options));
-        await channel.BasicPublishAsync(exchange: "direct_pagamento", routingKey: routingKey, body: messageResponseBody);
-
-        Console.WriteLine($" [x] Published to '{routingKey}': {JsonSerializer.Serialize(responseBody, options)}");
+        // Retornar a resposta do sistema externo para o front-end
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(paymentResponse);
     }
     catch (Exception ex)
     {
-        Console.WriteLine($" [!] Error: {ex.Message}");
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync($"Erro ao processar pagamento: {ex.Message}");
+        Console.WriteLine($"[!] Erro ao processar pagamento: {ex.Message}");
     }
-};
+});
 
-// consumo da fila "reserva-criada"
-await channel.QueueDeclareAsync(queue: "reserva-criada-pagamento", durable: true, exclusive: false, autoDelete: false);
-await channel.QueueBindAsync(queue: "reserva-criada-pagamento", exchange: "reserva-criada", routingKey: string.Empty);
-await channel.BasicConsumeAsync(queue: "reserva-criada-pagamento", autoAck: true, consumer: consumer);
+app.MapPost("/api/gerar-link", async (HttpContext context) =>
+{
+    try
+    {
+        var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+        Console.WriteLine($"[x] Payment link request received: {requestBody}");
+
+        // Solicitar link de pagamento ao sistema externo
+        using var httpClient = new HttpClient();
+        var externalResponse = await httpClient.PostAsync("http://localhost:5002/api/gerar-link", new StringContent(requestBody, Encoding.UTF8, "application/json"));
+        var responseContent = await externalResponse.Content.ReadAsStringAsync();
+
+        if (externalResponse.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"[x] Link de pagamento obtido: {responseContent}");
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(responseContent);
+        }
+        else
+        {
+            Console.WriteLine($"[!] Erro ao obter link: {externalResponse.StatusCode}");
+            context.Response.StatusCode = (int)externalResponse.StatusCode;
+            await context.Response.WriteAsync("Erro ao obter link de pagamento.");
+        }
+    }
+    catch (Exception ex)
+    {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync($"Erro interno do servidor: {ex.Message}");
+    }
+});
 
 Console.WriteLine(" [*] Waiting for messages in 'reserva-criada'.");
 Console.WriteLine(" Press [enter] to exit.");
 Console.ReadLine();
+
+await app.RunAsync("http://localhost:5003");

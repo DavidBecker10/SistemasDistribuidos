@@ -333,6 +333,22 @@ app.MapPost("/api/reserva/criar", async (HttpContext context) =>
         var bodyBytes = Encoding.UTF8.GetBytes(body);
         await channel.BasicPublishAsync(exchange: "reserva-criada", routingKey: string.Empty, body: bodyBytes);
 
+        // Solicitar link de pagamento ao microsserviço de pagamento
+        using var httpClient = new HttpClient();
+        var paymentResponse = await httpClient.PostAsync("http://localhost:5003/api/gerar-link", new StringContent(body, Encoding.UTF8, "application/json"));
+        var paymentContent = await paymentResponse.Content.ReadAsStringAsync();
+
+        if (paymentResponse.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"[x] Link de pagamento recebido: {paymentContent}");
+            var paymentInfo = JsonSerializer.Deserialize<JsonElement>(paymentContent);
+            reserva["paymentLink"] = paymentInfo.GetProperty("paymentLink").GetString();
+            reserva["paymentId"] = paymentInfo.GetProperty("paymentId").GetString();
+        }
+
+        // Salvar reserva atualizada com o link de pagamento
+        SaveReservas();
+
         context.Response.StatusCode = 201;
         await context.Response.WriteAsync("Reserva criada e publicada com sucesso!");
     }
