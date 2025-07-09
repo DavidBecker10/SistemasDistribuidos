@@ -60,6 +60,15 @@ class LeaderService(pb2_grpc.LeaderServiceServicer):
             return pb2.QueryResponse(epoch=epoch, offset=offset, content=content)
         else:
             return pb2.QueryResponse(epoch="", offset=-1, content="Não encontrado")
+        
+    def SyncLog(self, request, context):
+        cursor = self.db_final.cursor()
+        cursor.execute("SELECT epoch, offset, content FROM log WHERE epoch = ? AND offset >= ? ORDER BY offset",
+                    (request.epoch, request.offset))
+        entries = cursor.fetchall()
+        return pb2.SyncLogResponse(
+            entries=[pb2.Data(epoch=e[0], offset=e[1], content=e[2]) for e in entries]
+        )
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16replicacao_dados.proto\x12\x10replicacao_dados\"6\n\x04\x44\x61ta\x12\r\n\x05\x65poch\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"\x16\n\x03\x41\x63k\x12\x0f\n\x07message\x18\x01 \x01(\t\",\n\x0b\x43ommitOrder\x12\r\n\x05\x65poch\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\"\x1e\n\x0cQueryRequest\x12\x0e\n\x06offset\x18\x01 \x01(\x05\"?\n\rQueryResponse\x12\r\n\x05\x65poch\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t2\xdf\x01\n\rLeaderService\x12<\n\x0bReceiveData\x12\x16.replicacao_dados.Data\x1a\x15.replicacao_dados.Ack\x12\x42\n\nCommitData\x12\x1d.replicacao_dados.CommitOrder\x1a\x15.replicacao_dados.Ack\x12L\n\tQueryData\x12\x1e.replicacao_dados.QueryRequest\x1a\x1f.replicacao_dados.QueryResponse2\x9c\x01\n\x0eReplicaService\x12\x46\n\x15ReceiveDataFromLeader\x12\x16.replicacao_dados.Data\x1a\x15.replicacao_dados.Ack\x12\x42\n\nCommitData\x12\x1d.replicacao_dados.CommitOrder\x1a\x15.replicacao_dados.Ackb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16replicacao_dados.proto\x12\x10replicacao_dados\"6\n\x04\x44\x61ta\x12\r\n\x05\x65poch\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"\x16\n\x03\x41\x63k\x12\x0f\n\x07message\x18\x01 \x01(\t\",\n\x0b\x43ommitOrder\x12\r\n\x05\x65poch\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\"\x1e\n\x0cQueryRequest\x12\x0e\n\x06offset\x18\x01 \x01(\x05\"?\n\rQueryResponse\x12\r\n\x05\x65poch\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\"/\n\x0eSyncLogRequest\x12\r\n\x05\x65poch\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\x05\":\n\x0fSyncLogResponse\x12\'\n\x07\x65ntries\x18\x01 \x03(\x0b\x32\x16.replicacao_dados.Data2\xaf\x02\n\rLeaderService\x12<\n\x0bReceiveData\x12\x16.replicacao_dados.Data\x1a\x15.replicacao_dados.Ack\x12\x42\n\nCommitData\x12\x1d.replicacao_dados.CommitOrder\x1a\x15.replicacao_dados.Ack\x12L\n\tQueryData\x12\x1e.replicacao_dados.QueryRequest\x1a\x1f.replicacao_dados.QueryResponse\x12N\n\x07SyncLog\x12 .replicacao_dados.SyncLogRequest\x1a!.replicacao_dados.SyncLogResponse2\x9c\x01\n\x0eReplicaService\x12\x46\n\x15ReceiveDataFromLeader\x12\x16.replicacao_dados.Data\x1a\x15.replicacao_dados.Ack\x12\x42\n\nCommitData\x12\x1d.replicacao_dados.CommitOrder\x1a\x15.replicacao_dados.Ackb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -41,8 +41,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_QUERYREQUEST']._serialized_end=200
   _globals['_QUERYRESPONSE']._serialized_start=202
   _globals['_QUERYRESPONSE']._serialized_end=265
-  _globals['_LEADERSERVICE']._serialized_start=268
-  _globals['_LEADERSERVICE']._serialized_end=491
-  _globals['_REPLICASERVICE']._serialized_start=494
-  _globals['_REPLICASERVICE']._serialized_end=650
+  _globals['_SYNCLOGREQUEST']._serialized_start=267
+  _globals['_SYNCLOGREQUEST']._serialized_end=314
+  _globals['_SYNCLOGRESPONSE']._serialized_start=316
+  _globals['_SYNCLOGRESPONSE']._serialized_end=374
+  _globals['_LEADERSERVICE']._serialized_start=377
+  _globals['_LEADERSERVICE']._serialized_end=680
+  _globals['_REPLICASERVICE']._serialized_start=683
+  _globals['_REPLICASERVICE']._serialized_end=839
 # @@protoc_insertion_point(module_scope)

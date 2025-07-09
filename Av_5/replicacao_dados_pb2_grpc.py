@@ -49,6 +49,11 @@ class LeaderServiceStub(object):
                 request_serializer=replicacao__dados__pb2.QueryRequest.SerializeToString,
                 response_deserializer=replicacao__dados__pb2.QueryResponse.FromString,
                 _registered_method=True)
+        self.SyncLog = channel.unary_unary(
+                '/replicacao_dados.LeaderService/SyncLog',
+                request_serializer=replicacao__dados__pb2.SyncLogRequest.SerializeToString,
+                response_deserializer=replicacao__dados__pb2.SyncLogResponse.FromString,
+                _registered_method=True)
 
 
 class LeaderServiceServicer(object):
@@ -72,6 +77,12 @@ class LeaderServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SyncLog(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_LeaderServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -89,6 +100,11 @@ def add_LeaderServiceServicer_to_server(servicer, server):
                     servicer.QueryData,
                     request_deserializer=replicacao__dados__pb2.QueryRequest.FromString,
                     response_serializer=replicacao__dados__pb2.QueryResponse.SerializeToString,
+            ),
+            'SyncLog': grpc.unary_unary_rpc_method_handler(
+                    servicer.SyncLog,
+                    request_deserializer=replicacao__dados__pb2.SyncLogRequest.FromString,
+                    response_serializer=replicacao__dados__pb2.SyncLogResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -172,6 +188,33 @@ class LeaderService(object):
             '/replicacao_dados.LeaderService/QueryData',
             replicacao__dados__pb2.QueryRequest.SerializeToString,
             replicacao__dados__pb2.QueryResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SyncLog(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/replicacao_dados.LeaderService/SyncLog',
+            replicacao__dados__pb2.SyncLogRequest.SerializeToString,
+            replicacao__dados__pb2.SyncLogResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -27,10 +27,21 @@ message QueryResponse {
   string content = 3;
 }
 
+message SyncLogRequest {
+  string epoch = 1;
+  int32 offset = 2;
+}
+
+message SyncLogResponse {
+  repeated Data entries = 1;
+}
+
 service LeaderService {
   rpc ReceiveData(Data) returns (Ack);
   rpc CommitData(CommitOrder) returns (Ack);
   rpc QueryData(QueryRequest) returns (QueryResponse);
+  rpc SyncLog(SyncLogRequest) returns (SyncLogResponse);
+
 }
 
 service ReplicaService {
