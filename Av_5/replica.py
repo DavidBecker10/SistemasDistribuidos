@@ -18,14 +18,14 @@ class ReplicaService(pb2_grpc.ReplicaServiceServicer):
             print(f"[{self.replica_id}] Entrada já presente. Ignorando.")
             return pb2.Ack(message="ACK")
 
-        # Se já tem uma entrada diferente nesse offset → truncar e sincronizar
+        # Se já tem uma entrada diferente nesse offset, trunca e sincroniza
         if local_entry is not None and local_entry != (request.epoch, request.offset, request.content):
             print(f"[{self.replica_id}] Divergência no offset {request.offset}. Iniciando sincronização...")
             self.truncate_log_from_offset(request.offset)
             self.sync_log_from_leader(request.epoch, request.offset)
             return pb2.Ack(message="ACK")
 
-        # Se a entrada está à frente (gap), buscar os dados faltantes
+        # Se a entrada está a frente, busca os dados faltantes
         if local_entry is None:
             max_offset = self.get_max_offset()
             if request.offset > max_offset + 1:
